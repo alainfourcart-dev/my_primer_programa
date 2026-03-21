@@ -13,7 +13,8 @@ def inicializar_db():
             dia TEXT NOT NULL, 
             hora TEXT NOT NULL,
             nombre TEXT,
-            telefono TEXT
+            telefono TEXT,
+            estado TEXT NOT FULL
         )
     """)
 
@@ -50,21 +51,28 @@ def guardar_cita(fecha, hora, nombre, telefono):
     cursor = conexion.cursor()
 
     cursor.execute(
-        "INSERT INTO citas (dia, hora, nombre, telefono) VALUES (?, ?, ?, ?)",
-        (fecha, hora, nombre, telefono)
+        "INSERT INTO citas (dia, hora, nombre, telefono, estado) VALUES (?, ?, ?, ?, ?)",
+        (fecha, hora, nombre, telefon, "pendiente")
     )
 
     conexion.commit()
     conexion.close()
 
-def generar_horas(inicio, fin, intervalo=30):
+def generar_horas(inicio, fin, intervalo=40, primera_diferente=False):
     horas = []
     actual = datetime.strptime(inicio, "%H:%M")
     final = datetime.strptime(fin, "%H:%M")
 
-    while actual < final:
+    primera = True
+
+    while actual <= final:
         horas.append(actual.strftime("%H:%M"))
-        actual += timedelta(minutes=intervalo)
+
+        if primera and primera_diferente:
+            actual += timedelta(minutes=30)
+            primera = False
+        else:
+            actual += timedelta(minutes=intervalo)
 
     return horas
 
@@ -75,7 +83,7 @@ def obtener_disponibilidad():
     dias_semana = ["Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 
     horas_manana = generar_horas ("10:00", "14:00", 40)
-    horas_tarde = generar_horas ("16:30", "21:00", 40)
+    horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
 
     for dia in dias_semana:
         if dia == "Sábado":
@@ -169,7 +177,7 @@ def inicio():
             telefono = request.form["telefono"]
 
             guardar_cita(dia, hora, nombre, telefono)
-            respuesta = f"{nombre}, tu cita ha sido reservada para {dia} a las {hora}."
+            respuesta = f"{nombre}, hemos recibido tu solicitud para {dia} a las {hora}. Te confirmaremos por teléfono."
             disponibilidad = obtener_disponibilidad()
 
     bienvenida = [

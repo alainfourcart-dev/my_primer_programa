@@ -113,13 +113,18 @@
 <div class="bloque-dia">
     <span class="titulo-dia">{{ dia }}</span>
 
-    {% for hora in horas %}
-    <form method="POST" style="display:inline;">
+    <form method="POST">
         <input type="hidden" name="dia" value="{{ dia }}">
-        <input type="hidden" name="hora" value="{{ hora }}">
+
         <input type="text" name="nombre" placeholder="Tu nombre" required>
         <input type="text" name="telefono" placeholder="Tu telefono" required>
-        <button class="hora-btn">{{ hora }}</button>
+
+        {% for hora in horas %}
+            <button type="submit" name="hora" value="{{ hora }}" class="hora-btn">
+                {{ hora }}
+            </button>
+        {% endfor %}
+
     </form>
     {% endfor %}
 </div>
