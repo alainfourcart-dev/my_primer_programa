@@ -12,16 +12,16 @@ def cargar_datos():
                 datos[clave.strip()] = valor.strip()
     return datos
 
+import os
+
 def cargar_citas():
+    if not os.path.exists("citas.txt"):
+        open("citas.txt", "w").close()
+
     citas = []
-    try:
-        with open("citas.txt", "r", encoding="utf-8") as archivo:
-            for linea in archivo:
-                linea = linea.strip()
-                if linea:
-                    citas.append(linea)
-    except FileNotFoundError:
-        pass
+    with open("citas.txt", "r") as f:
+            for linea in f:
+                citas.append(linea.strip())
     return citas
 
 def guardar_cita(fecha, hora):
