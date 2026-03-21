@@ -12,6 +12,8 @@ def inicializar_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             dia TEXT NOT NULL, 
             hora TEXT NOT NULL
+            nombre TEXT,
+            telefono TEXT
         )
     """)
 
@@ -43,13 +45,13 @@ def cargar_citas():
     citas = [f"{dia}|{hora}" for dia, hora in filas]
     return citas
 
-def guardar_cita(fecha, hora):
+def guardar_cita(fecha, hora, nombre, telefono):
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
     cursor.execute(
-        "INSERT INTO citas (dia, hora) VALUES (?, ?)",
-        (fecha, hora)
+        "INSERT INTO citas (dia, hora, nombre, telefono) VALUES (?, ?, ?, ?)",
+        (fecha, hora, nombre, telefono)
     )
 
     conexion.commit()
@@ -163,8 +165,11 @@ def inicio():
         elif "dia" in request.form and "hora" in request.form:
             dia = request.form["dia"]
             hora = request.form["hora"]
-            guardar_cita(dia, hora)
-            respuesta = f"Tu cita ha sido reservada para {dia} a las {hora}."
+            nombre = request.form["nombre"]
+            telefono = request.form["telefono"]
+
+            guardar_cita(dia, hora, nombre, telefono)
+            respuesta = f"{nombre}, tu cita ha sido reservada para {dia} a las {hora}."
             disponibilidad = obtener_disponibilidad()
 
     bienvenida = [

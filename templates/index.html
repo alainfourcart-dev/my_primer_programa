@@ -117,6 +117,8 @@
     <form method="POST" style="display:inline;">
         <input type="hidden" name="dia" value="{{ dia }}">
         <input type="hidden" name="hora" value="{{ hora }}">
+        <input type="text" name="nombre" placeholder="Tu nombre" required>
+        <input type="text" name="telefono" placeholder="Tu telefono" required>
         <button class="hora-btn">{{ hora }}</button>
     </form>
     {% endfor %}
