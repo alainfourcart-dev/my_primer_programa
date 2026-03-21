@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso administrador</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f1e8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            width: 320px;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #111827;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }   
+
+        button:hover {
+            opacity: 0.95;
+        }    
+
+        .error{
+            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid #f5c2c2;
+            border-radius: 10px;
+            background: #fdeaea;
+            color: #a33a3a;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Acceso administrador</h2>
+        
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST">
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</body>
+</html>

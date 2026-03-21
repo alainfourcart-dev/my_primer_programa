@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from datetime import datetime, timedelta
 import os
 import sqlite3
+ADMIN_PASSWORD = "1234"
+SECRET_KEY = "mi_clave_secreta_123"
 
 def inicializar_db():
     conexion = sqlite3.connect("citas.db")
@@ -22,6 +24,7 @@ def inicializar_db():
     conexion.close()
 
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 
 inicializar_db()
 
@@ -175,7 +178,7 @@ def inicio():
     respuesta = None
     pregunta = ""
     tipo_respuesta = ""
-    
+
     disponibilidad = obtener_disponibilidad()
 
     if request.method == "POST":
@@ -210,8 +213,26 @@ def inicio():
 
     return render_template("index.html", bienvenida=bienvenida, respuesta=respuesta, pregunta=pregunta, disponibilidad=disponibilidad, tipo_respuesta=tipo_respuesta)
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = ""
+
+    if request.method == "POST":
+        password = request.form["password"]
+
+        if password == ADMIN_PASSWORD:
+            session["admin"] = True
+            return redirect("/admin")
+        else:
+            error = "Contraseña incorrecta"
+
+    return render_template("login.html", error=error)
+
 @app.route("/admin")
 def admin():
+    if not session.get("admin"):
+        return redirect("/login")
+    
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
@@ -221,6 +242,11 @@ def admin():
     conexion.close()
 
     return render_template("admin.html", citas=citas)
+
+@app.route("/logout")
+def logout():
+    session.pop("admin", None)
+    return redirect("/login")
 
 @app.route("/confirmar/<dia>/<hora>")
 def confirmar(dia, hora):
