@@ -1,7 +1,26 @@
 from flask import Flask, render_template, request
 from datetime import datetime, timedelta
+import os
+import sqlite3
+
+def inicializar_db():
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS citas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            dia TEXT NOT NULL, 
+            hora TEXT NOT NULL
+        )
+    """)
+
+    conexion.commit()
+    conexion.close()
 
 app = Flask(__name__)
+
+inicializar_db()
 
 def cargar_datos():
     datos = {}
@@ -12,21 +31,29 @@ def cargar_datos():
                 datos[clave.strip()] = valor.strip()
     return datos
 
-import os
-
 def cargar_citas():
-    if not os.path.exists("citas.txt"):
-        open("citas.txt", "w").close()
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
 
-    citas = []
-    with open("citas.txt", "r") as f:
-            for linea in f:
-                citas.append(linea.strip())
+    cursor.execute("SELECT dia, hora FROM citas")
+    filas = cursor.fetchall()
+
+    conexion.close()
+
+    citas = [f"{dia}|{hora}" for dia, hora in filas]
     return citas
 
 def guardar_cita(fecha, hora):
-    with open("citas.txt", "a", encoding="utf-8") as archivo:
-        archivo.write(f"{fecha}|{hora}\n")
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute(
+        "INSERT INTO citas (dia, hora) VALUES (?, ?)",
+        (fecha, hora)
+    )
+
+    conexion.commit()
+    conexion.close()
 
 def generar_horas(inicio, fin, intervalo=30):
     horas = []
