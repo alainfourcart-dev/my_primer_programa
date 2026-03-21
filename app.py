@@ -174,6 +174,8 @@ def inicio():
     datos = cargar_datos()
     respuesta = None
     pregunta = ""
+    tipo_respuesta = ""
+    
     disponibilidad = obtener_disponibilidad()
 
     if request.method == "POST":
