@@ -1,26 +1,119 @@
-<h2>Panel de citas</h2>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de citas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f1e8;
+            margin: 0;
+            padding: 30px;
+        }
 
-<table border="1">
-    <tr>
-        <th>Día</th>
-        <th>Hora</th>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-    </tr>
+        .contenedor {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
 
-    {% for cita in citas %}
-    <tr>
-        <td>{{ cita [0] }} </td>
-        <td>{{ cita [1] }} </td>
-        <td>{{ cita [2] }} </td>
-        <td>{{ cita [3] }} </td>
-        <td>{{ cita [4] }} </td>
-        <td>
-            <a href="/confirmar/{{cita[0] }}/{{ cita[1] }}">✅</a>
-            <a href="/cancelar/{{cita[0] }}/{{ cita[1] }}">❌</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        th {
+            background: #111827;
+            color: white;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .estado {
+            font-weight: bold;
+            padding: 6px 10px;
+            border-radius: 999px;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confirmada {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .acciones a {
+            text-decoration: none;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .vacio {
+            margin-top: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <h2>Panel de citas</h2>
+
+        {% if citas%}
+        <table>
+            <tr>
+                <th>Día</th>
+                <th>Hora</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            
+            {% for cita in citas %}
+            <tr>
+                <td>{{ cita [0] }} </td>
+                <td>{{ cita [1] }} </td>
+                <td>{{ cita [2] }} </td>
+                <td>{{ cita [3] }} </td>
+                <td>
+                    <span class="estado {{ cita [4] }}"></td>
+                        {{ cita [4] }}
+                    </span>
+                </td>
+                <td class="acciones">
+                    <a href="/confirmar/{{cita[0] }}/{{ cita[1] }}">✅</a>
+                    <a href="/cancelar/{{cita[0] }}/{{ cita[1] }}">❌</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p class="vacio">No hay citas registradas.</p>
+        {% endif %}
+    </div>
+<body>
+</html>
