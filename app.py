@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from datetime import datetime, timedelta
 import os
 import sqlite3
@@ -198,6 +198,30 @@ def admin():
     conexion.close()
 
     return render_template("admin.html", citas=citas)
+
+@app.route("/confirmar/<dia>/<hora>")
+def confirmar(dia, hora):
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("UPDATE citas SET estado='confirmada' WHERE dia=? AND hora=?", (dia, hora))
+
+    conexion.commit()
+    conexion.close()
+
+    return redirect("/admin")
+
+@app.route("/cancelar/<dia>/<hora>")
+def cancelar(dia, hora):
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("DELETE FROM citas WHERE dia=? AND hora=?", (dia, hora))
+
+    conexion.commit()
+    conexion.close()
+
+    return redirect("/admin")
 
 if __name__ == "__main__":
     import os
