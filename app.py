@@ -14,7 +14,7 @@ def inicializar_db():
             hora TEXT NOT NULL,
             nombre TEXT,
             telefono TEXT,
-            estado TEXT NOT FULL
+            estado TEXT NOT NULL
         )
     """)
 
