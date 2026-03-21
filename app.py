@@ -11,7 +11,7 @@ def inicializar_db():
         CREATE TABLE IF NOT EXISTS citas (
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             dia TEXT NOT NULL, 
-            hora TEXT NOT NULL
+            hora TEXT NOT NULL,
             nombre TEXT,
             telefono TEXT
         )
@@ -74,8 +74,8 @@ def obtener_disponibilidad():
 
     dias_semana = ["Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 
-    horas_manana = generar_horas ("10:00", "14:00", 30)
-    horas_tarde = generar_horas ("16:30", "21:00", 30)
+    horas_manana = generar_horas ("10:00", "14:00", 40)
+    horas_tarde = generar_horas ("16:30", "21:00", 40)
 
     for dia in dias_semana:
         if dia == "Sábado":
