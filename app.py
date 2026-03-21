@@ -51,12 +51,23 @@ def guardar_cita(fecha, hora, nombre, telefono):
     cursor = conexion.cursor()
 
     cursor.execute(
+        "SELECT COUNT (*) FROM citas WHERE dia=? AND hora=?",
+        (fecha, hora)
+    )
+    existe = cursor.fetchone()[0]
+
+    if existe > 0:
+        conexion.close()
+        return False
+
+    cursor.execute(
         "INSERT INTO citas (dia, hora, nombre, telefono, estado) VALUES (?, ?, ?, ?, ?)",
         (fecha, hora, nombre, telefono, "pendiente")
     )
 
     conexion.commit()
     conexion.close()
+    return True
 
 def generar_horas(inicio, fin, intervalo=40, primera_diferente=False):
     horas = []
@@ -176,8 +187,12 @@ def inicio():
             nombre = request.form["nombre"]
             telefono = request.form["telefono"]
 
-            guardar_cita(dia, hora, nombre, telefono)
-            respuesta = f"{nombre}, hemos recibido tu solicitud para {dia} a las {hora}. Te confirmaremos por teléfono."
+            guardada = guardar_cita(dia, hora, nombre, telefono)
+            if guardada:
+                respuesta = f"{nombre}, hemos recibido tu solicitud para {dia} a las {hora}. Te confirmaremos por teléfono."
+            else:
+                respuesta = f"Lo siento, {nombre}. Esa hora ya no está disponible. Elige otra por favor."
+                
             disponibilidad = obtener_disponibilidad()
 
     bienvenida = [
