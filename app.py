@@ -14,7 +14,7 @@ def inicializar_db():
             hora TEXT NOT NULL,
             nombre TEXT,
             telefono TEXT,
-            estado TEXT NOT NULL
+            estado TEXT DEFAULT 'pendiente'
         )
     """)
 
@@ -65,7 +65,7 @@ def generar_horas(inicio, fin, intervalo=40, primera_diferente=False):
 
     primera = True
 
-    while actual <= final:
+    while actual < final:
         horas.append(actual.strftime("%H:%M"))
 
         if primera and primera_diferente:
@@ -186,6 +186,18 @@ def inicio():
     ]
 
     return render_template("index.html", bienvenida=bienvenida, respuesta=respuesta, pregunta=pregunta, disponibilidad=disponibilidad)
+
+@app.route("/admin")
+def admin():
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT dia, hora, nombre, telefono, estado FROM citas ORDER BY dia, hora")
+    citas = cursor.fetchall()
+
+    conexion.close()
+
+    return render_templete("admin.html", citas=citas)
 
 if __name__ == "__main__":
     import os

@@ -1,0 +1,21 @@
+<h2>Panel de citas</h2>
+
+<table border="1">
+    <tr>
+        <th>Día</th>
+        <th>Hora</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Estado</th>
+    </tr>
+
+    {% for cita in citas %}
+    <tr>
+        <td>{{ cita [0] }} </td>
+        <td>{{ cita [1] }} </td>
+        <td>{{ cita [2] }} </td>
+        <td>{{ cita [3] }} </td>
+        <td>{{ cita [4] }} </td>
+    </tr>
+    {% endfor %}
+</table>
