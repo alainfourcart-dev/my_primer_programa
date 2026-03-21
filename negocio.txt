@@ -1,0 +1,16 @@
+nombre = Rocha Peluqueros
+tipo = Peluquería
+horario = de martes a sábados de 10:00 a 14:00 y de 16:30 a 21:00 (verano tardes desde 17:00. Lunes cerrado.)
+direccion = C/ Gutiérrez de Cetina, 35, Los Palacios y Villafranca, Sevilla
+telefono = 622 537 333
+whatsapp= 622 537 333
+servicios = corte de pelo, barba, corte + barba, mechas, decoloración
+reservas = si
+link_reserva = https://forms.gle/VWcuBtio6F7NT7FH6
+precio_corte = 12€
+precio_barba = 8€
+precio_corte_barba = 15€
+precio_nino = 10€
+precio_mechas = 35€
+precio_decoloración = 50€
+pago = Solo pago en efectivo

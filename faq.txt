@@ -1,0 +1,11 @@
+horario|Nuestro horario es {horario}
+direccion|Estamos en {direccion}
+telefono|Puede llamarnos al {telefono}
+whatsapp|Puede escribirnos por WhatsApp al {whatsapp}
+nombre|Está contactando con {nombre}
+tipo|Somos un {tipo}
+servicios|Ofrecemos {servicios}
+reservas|Sí, aceptamos reservas
+precio|El precio del corte es {precio_corte}
+barba|El arreglo de la barba cuesta {precio_barba}
+cita|Para pedir cita escríbenos o usa este enlace: {link_reserva}

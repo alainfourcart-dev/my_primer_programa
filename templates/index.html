@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Rocha Peluqueros</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #ece5dd;
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .chat {
+            width: 400px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .bot {
+            background: #e4e6eb;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+        .user {
+            background: #dcf8c6;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+            text-align: right;
+        }
+
+        input {
+            width: 70%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            background: black;
+            color: white;
+            border-radius: 8px;
+        }   
+    </style>
+</head>
+
+<body>
+
+<div class="chat">
+
+<h3>💈 Rocha Peluqueros</h3>
+
+{% for mensaje in bienvenida %}
+<div class="bot">{{ mensaje }}</div>
+{% endfor %}
+
+{% if pregunta %}
+<div class="user">{{ pregunta }}</div>
+{% endif %}
+
+{% if respuesta %}
+<div class="bot">{{ respuesta }}</div>
+{% endif %}
+
+<form method="POST">
+    <input type="text" name="pregunta" placeholder="Escribe tu mensaje..." required>
+    <button>Enviar</button>
+</form>
+
+<h3>Disponibilidad</h3>
+
+{% for dia, horas in disponibilidad.items() %}
+    <div style="margin-bottom:15px;">
+        <strong>{{ dia }}</strong><br>
+
+        {% for hora in horas %}
+            <form method="POST" style="display:inline;">
+                <input type="hidden" name="dia" value="{{ dia }}">
+                <input type="hidden" name="hora" value="{{ hora }}">
+                <button style="margin:3px;">{{ hora }}</button>
+            </form>
+        {% endfor %}
+    </div>
+{% endfor %}  
+
+</div>
+
+</body>
+</html>
