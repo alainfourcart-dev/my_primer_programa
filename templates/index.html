@@ -46,6 +46,41 @@
             color: white;
             border-radius: 8px;
         }   
+
+        .respuesta-reserva{
+            background: #e8f7e8;
+            border: 1px solid #b7e4b8;
+            color: #1f5f2c;
+        }    
+
+        .hora-btn{
+            margin:3px;
+            padding:8px 10px;
+            border:none;
+            border-radius:8px;
+            background: #111827;
+            color:white;
+            cursor:pointer;
+            font-size:14px;
+        }
+
+        .hora-btn-hover{
+            background: #374151;
+        }
+
+        .bloque-dia{
+            margin-bottom:18px;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 10px;
+        }
+
+        .titulo-dia{
+            display:block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 
@@ -64,7 +99,7 @@
 {% endif %}
 
 {% if respuesta %}
-<div class="bot">{{ respuesta }}</div>
+<div class="bot respuesta-reserva">{{ respuesta }}</div>
 {% endif %}
 
 <form method="POST">
@@ -75,14 +110,14 @@
 <h3>Disponibilidad</h3>
 
 {% for dia, horas in disponibilidad.items() %}
-    <div style="margin-bottom:15px;">
-        <strong>{{ dia }}</strong><br>
+    <div class="bloque-dia">
+        <span class="titulo-dia">{{ dia }}</span>
 
         {% for hora in horas %}
             <form method="POST" style="display:inline;">
                 <input type="hidden" name="dia" value="{{ dia }}">
                 <input type="hidden" name="hora" value="{{ hora }}">
-                <button style="margin:3px;">{{ hora }}</button>
+                <button class="hora-btn">{{ hora }}</button>
             </form>
         {% endfor %}
     </div>
