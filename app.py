@@ -197,7 +197,7 @@ def admin():
 
     conexion.close()
 
-    return render_templete("admin.html", citas=citas)
+    return render_template("admin.html", citas=citas)
 
 if __name__ == "__main__":
     import os
