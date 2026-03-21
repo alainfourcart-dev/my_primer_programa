@@ -188,19 +188,25 @@ def inicio():
             telefono = request.form["telefono"]
 
             guardada = guardar_cita(dia, hora, nombre, telefono)
+
+            tipo_respuesta = ""
+
             if guardada:
                 respuesta = f"{nombre}, hemos recibido tu solicitud para {dia} a las {hora}. Te confirmaremos por teléfono."
+                tipo_respuesta = "ok"
             else:
                 respuesta = f"Lo siento, {nombre}. Esa hora ya no está disponible. Elige otra por favor."
-                
+                tipo_respuesta = "error"
+
             disponibilidad = obtener_disponibilidad()
+            pregunta = ""
 
     bienvenida = [
         f"Buenos días. Gracias por contactar con {datos['nombre']}.",
         "¿En qué puedo ayudarte?"
     ]
 
-    return render_template("index.html", bienvenida=bienvenida, respuesta=respuesta, pregunta=pregunta, disponibilidad=disponibilidad)
+    return render_template("index.html", bienvenida=bienvenida, respuesta=respuesta, pregunta=pregunta, disponibilidad=disponibilidad, tipo_respuesta=tipo_respuesta)
 
 @app.route("/admin")
 def admin():

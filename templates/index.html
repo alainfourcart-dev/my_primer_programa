@@ -81,6 +81,25 @@
             font-weight: bold;
         }
 
+        .respuesta {
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .respuesta.ok {
+            background: #eaf7e7;
+            color: #2d6a2d;
+            border: 1px solid #cfe8c8;
+        }
+
+        .respuesta.error {
+            background: #fdeaea;
+            color: #a33a3a;
+            border: 1px solid #f5c2c2;
+        }
+
     </style>
 </head>
 
@@ -99,7 +118,9 @@
 {% endif %}
 
 {% if respuesta %}
-<div class="bot respuesta-reserva">{{ respuesta }}</div>
+    <div class="respuesta {{ tipo_respuesta }}">
+        {{ respuesta }}
+    </div>
 {% endif %}
 
 <form method="POST">
