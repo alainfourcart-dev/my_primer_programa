@@ -110,17 +110,17 @@
 <h3>Disponibilidad</h3>
 
 {% for dia, horas in disponibilidad.items() %}
-    <div class="bloque-dia">
-        <span class="titulo-dia">{{ dia }}</span>
+<div class="bloque-dia">
+    <span class="titulo-dia">{{ dia }}</span>
 
-        {% for hora in horas %}
-            <form method="POST" style="display:inline;">
-                <input type="hidden" name="dia" value="{{ dia }}">
-                <input type="hidden" name="hora" value="{{ hora }}">
-                <button class="hora-btn">{{ hora }}</button>
-            </form>
-        {% endfor %}
-    </div>
+    {% for hora in horas %}
+    <form method="POST" style="display:inline;">
+        <input type="hidden" name="dia" value="{{ dia }}">
+        <input type="hidden" name="hora" value="{{ hora }}">
+        <button class="hora-btn">{{ hora }}</button>
+    </form>
+    {% endfor %}
+</div>
 {% endfor %}  
 
 </div>
