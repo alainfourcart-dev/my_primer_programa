@@ -52,7 +52,7 @@ def guardar_cita(fecha, hora, nombre, telefono):
 
     cursor.execute(
         "INSERT INTO citas (dia, hora, nombre, telefono, estado) VALUES (?, ?, ?, ?, ?)",
-        (fecha, hora, nombre, telefon, "pendiente")
+        (fecha, hora, nombre, telefono, "pendiente")
     )
 
     conexion.commit()
