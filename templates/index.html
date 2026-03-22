@@ -130,17 +130,17 @@
 
 <h3>Disponibilidad</h3>
 
-{% for dia, horas in disponibilidad.items() %}
+{% for etiqueta, info in disponibilidad.items() %}
 <div class="bloque-dia">
-    <span class="titulo-dia">{{ dia }}</span>
+    <span class="titulo-dia">{{ etiqueta }}</span>
 
     <form method="POST">
-        <input type="hidden" name="dia" value="{{ dia }}">
+        <input type="hidden" name="dia" value="{{ info.fecha }}">
 
         <input type="text" name="nombre" placeholder="Tu nombre" required>
         <input type="text" name="telefono" placeholder="Tu telefono" required>
 
-        {% for hora in horas %}
+        {% for hora in info.horas %}
             <button type="submit" name="hora" value="{{ hora }}" class="hora-btn">
                 {{ hora }}
             </button>

@@ -1,13 +1,32 @@
 from flask import Flask, render_template, request, redirect, session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from twilio.rest import Client
+from openai import OpenAI 
 import os
 import sqlite3
 ADMIN_PASSWORD = "1234"
 SECRET_KEY = "mi_clave_secreta_123"
 
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_WHATSAPP_FROM = "whatsapp:+14155238886"
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+openai_client = OpenAI(api_key=OPENAI_API_KEY)
+
 BLOQUEOS_FIJOS = {
     "Jueves": ["12:00", "12:40", "13:20", "16:30", "17:00", "17:40", "18:20", "19:00", "19:40", "20:20"],
     "Viernes": ["10:00", "12:00", "12:40", "13:20", "16:30", "17:00", "18:20", "19:00", "19:40"]
+}
+
+DIAS_ES = {
+    0: "Lunes",
+    1: "Martes",
+    2: "Miércoles",
+    3: "Jueves",
+    4: "Viernes",
+    5: "Sábado",
+    6: "Domingo"
 }
 
 def inicializar_db():
@@ -77,6 +96,59 @@ def guardar_cita(fecha, hora, nombre, telefono):
     conexion.close()
     return True
 
+def normalizar_telefono_whatsapp(telefono):
+    telefono = telefono.strip().replace(" ", "")
+    if telefono.startswith("+"):
+        return f"whatsapp:{telefono}"
+    if telefono.startswith("6") or telefono.startswith("7"):
+        return f"whatsapp:+34{telefono}"
+    return f"whatsapp:{telefono}"
+
+def enviar_whatsapp(telefono, mensaje):
+    try:
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        destino = normalizar_telefono_whatsapp(telefono)
+
+        print("Enviando a:", destino)
+        print("Mensaje:", mensaje)
+
+        respuesta = client.messages.create(
+            from_=TWILIO_WHATSAPP_FROM,
+            to=destino,
+            body=mensaje
+        )
+
+        print("SID mensaje:", respuesta.sid)
+        return True
+    
+    except Exception as e:
+        print("Error enviando whatsApp:", e)
+        return False
+
+def respuesta_ia_whatsapp(mensaje_usuario):
+    prompt_sistema = f"""
+Eres el asistente de WhatsApp de Rocha Peluqueros.
+
+Datos del negocio:
+- Horario: martes a viernes de 10:00 a 14:00 y de 16:30 a 21:00. Sábado de 10:00 a 14:00.
+- Servicios: corte, barba, corte + barba, corte + mechas, corte + color.
+- Las citas se solicitan desde un enlace con calendario.
+- Si el cliente quiere reservar, indícale este enlace: https://my-primer-programa.onrender.com
+- Sé breve, amable y claro.
+- Responde en español.
+- Si no sabes algo, dilo sin inventar.
+"""
+    
+    respuesta = openai_client.responses.create(
+        model="gpt-4.1-mini",
+        input=[
+            {"role": "system", "content": prompt_sistema},
+            {"role": "user", "content": mensaje_usuario}
+        ]
+    )
+
+    return respuesta.output_text.strip()
+
 def generar_horas(inicio, fin, intervalo=40, primera_diferente=False):
     horas = []
     actual = datetime.strptime(inicio, "%H:%M")
@@ -99,26 +171,38 @@ def obtener_disponibilidad():
     citas_ocupadas = cargar_citas()
     disponibilidad = {}
 
-    dias_semana = ["Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-
     horas_manana = generar_horas ("10:00", "14:00", 40)
     horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
 
-    for dia in dias_semana:
-        if dia == "Sábado":
+    hoy = date.today()
+
+    for i in range (30):
+        fecha = hoy + timedelta(days=i)
+        nombre_dia = DIAS_ES[fecha.weekday()]
+
+        if nombre_dia not in ["Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]:
+            continue
+
+        if nombre_dia == "Sábado":
             todas = horas_manana
         else:
             todas = horas_manana + horas_tarde
+        bloqueadas = BLOQUEOS_FIJOS.get(nombre_dia, [])
         libres = []
 
+        fecha_str = fecha.strftime("%Y-%m-%d")
+        etiqueta = f"{nombre_dia} {fecha.strftime('%d/%m')}"
+
         for hora in todas:
-            clave = f"{dia}|{hora}"
+            clave = f"{fecha_str}|{hora}"
 
-            bloqueada_fija = dia in BLOQUEOS_FIJOS and hora in BLOQUEOS_FIJOS[dia]
-
-            if clave not in citas_ocupadas and not bloqueada_fija:
+            if clave not in citas_ocupadas and hora not in bloqueadas:
                 libres.append(hora)
-        disponibilidad[dia] = libres
+
+        disponibilidad[etiqueta] = {
+            "fecha": fecha_str,
+            "horas": libres
+        }
 
     return disponibilidad                
 
@@ -205,7 +289,10 @@ def inicio():
             tipo_respuesta = ""
 
             if guardada:
-                respuesta = f"{nombre}, hemos recibido tu solicitud para {dia} a las {hora}. Te confirmaremos por teléfono."
+                fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
+                dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
+
+                respuesta = f"{nombre}, hemos recibido tu solicitud para {dia_bonito} a las {hora}. Te confirmaremos por teléfono."
                 tipo_respuesta = "ok"
             else:
                 respuesta = f"Lo siento, {nombre}. Esa hora ya no está disponible. Elige otra por favor."
@@ -258,27 +345,88 @@ def logout():
 
 @app.route("/confirmar/<dia>/<hora>")
 def confirmar(dia, hora):
+    if not session.get("admin"):
+        return redirect("/login")
+    
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
-    cursor.execute("UPDATE citas SET estado='confirmada' WHERE dia=? AND hora=?", (dia, hora))
+    cursor.execute(
+        "SELECT nombre, telefono FROM citas WHERE dia=? AND hora=?",
+        (dia, hora)
+    )
+    fila = cursor.fetchone()
+
+    cursor.execute(
+        "UPDATE citas SET estado='confirmada' WHERE dia=? AND hora=?",
+        (dia, hora)
+    )
 
     conexion.commit()
     conexion.close()
+
+    if fila:
+        nombre, telefono = fila
+        fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
+        dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
+        mensaje = f"Hola {nombre}, tu cita en Rocha Peluqueros ha sido confirmada para {dia_bonito} a las {hora}."
+        enviar_whatsapp(telefono, mensaje)
 
     return redirect("/admin")
 
 @app.route("/cancelar/<dia>/<hora>")
 def cancelar(dia, hora):
+    if not session.get("admin"):
+        return redirect("/login")
+    
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
-    cursor.execute("DELETE FROM citas WHERE dia=? AND hora=?", (dia, hora))
+    cursor.execute(
+        "SELECT nombre, telefono FROM citas WHERE dia=? AND hora=?",
+        (dia, hora)
+    )
+    fila = cursor.fetchone()
+
+    if fila:
+        nombre, telefono = fila
+        fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
+        dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
+        mensaje = f"Hola {nombre}, tu solicitud de cita en Rocha Peluqueros para {dia_bonito} a las {hora} ha sido cancelada."
+        enviar_whatsapp(telefono, mensaje)
+
+    cursor.execute(
+        "DELETE FROM citas WHERE dia=? AND hora=?",
+        (dia, hora)
+    )
 
     conexion.commit()
     conexion.close()
 
     return redirect("/admin")
+
+@app.route("/whatsapp", methods=["POST"])
+def whatsapp_webhook():
+    mensaje = request.form.get("Body", "").strip()
+    telefono = request.form.get("From", "").strip()
+
+    if not mensaje or not telefono:
+        return "OK", 200
+    
+    try:
+        texto_respuesta = respuesta_ia_whatsapp(mensaje)
+
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        client.messages.create(
+            from_=TWILIO_WHATSAPP_FROM,
+            to=telefono,
+            body=texto_respuesta
+        )
+
+    except Exception as e:
+        print("Error webhook WhatsApp:", e)
+
+    return "OK", 200
 
 if __name__ == "__main__":
     import os
