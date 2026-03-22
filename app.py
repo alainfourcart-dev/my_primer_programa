@@ -5,6 +5,11 @@ import sqlite3
 ADMIN_PASSWORD = "1234"
 SECRET_KEY = "mi_clave_secreta_123"
 
+BLOQUEOS_FIJOS = {
+    "Jueves": ["12:00", "12:40", "13:20", "16:30", "17:00", "17:40", "18:20", "19:00", "19:40", "20:20"],
+    "Viernes": ["10:00", "12:00", "12:40", "13:20", "16:30", "17:00", "18:20", "19:00", "19:40"]
+}
+
 def inicializar_db():
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
