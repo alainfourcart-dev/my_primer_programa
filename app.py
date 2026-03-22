@@ -407,21 +407,31 @@ def cancelar(dia, hora):
 
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_webhook():
+    print("=== WEBHOOK WHATSAPP LLAMADO ===")
+    print("Form completo:", dict(request.form))
+
     mensaje = request.form.get("Body", "").strip()
     telefono = request.form.get("From", "").strip()
 
+    print("Mensaje recibido:", mensaje)
+    print("Telefono recibido:", telefono)
+
     if not mensaje or not telefono:
+        print("Faltan datos")
         return "OK", 200
     
     try:
         texto_respuesta = respuesta_ia_whatsapp(mensaje)
+        print("Respuesta IA:", texto_respuesta)
 
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        client.messages.create(
+        respuesta = client.messages.create(
             from_=TWILIO_WHATSAPP_FROM,
             to=telefono,
             body=texto_respuesta
         )
+
+        print("SID Twilio:", respuesta.sid)
 
     except Exception as e:
         print("Error webhook WhatsApp:", e)
