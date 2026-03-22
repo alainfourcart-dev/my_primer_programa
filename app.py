@@ -113,7 +113,10 @@ def obtener_disponibilidad():
 
         for hora in todas:
             clave = f"{dia}|{hora}"
-            if clave not in citas_ocupadas:
+
+            bloqueada_fija = dia in BLOQUEOS_FIJOS and hora in BLOQUEOS_FIJOS[dia]
+
+            if clave not in citas_ocupadas and not bloqueada_fija:
                 libres.append(hora)
         disponibilidad[dia] = libres
 
