@@ -407,21 +407,26 @@ def cancelar(dia, hora):
 
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_webhook():
-    print("=== WEBHOOK WHATSAPP LLAMADO ===")
-    print("Form completo:", dict(request.form))
-
-    mensaje = request.form.get("Body", "").strip()
-    telefono = request.form.get("From", "").strip()
-
-    print("Mensaje recibido:", mensaje)
-    print("Telefono recibido:", telefono)
-
-    if not mensaje or not telefono:
-        print("Faltan datos")
-        return "OK", 200
-    
     try:
-        texto_respuesta = respuesta_ia_whatsapp(mensaje)
+        print("=== WEBHOOK WHATSAPP LLAMADO ===")
+        print("Form completo:", dict(request.form))
+
+        mensaje = request.form.get("Body", "").strip()
+        telefono = request.form.get("From", "").strip()
+
+        print("Mensaje recibido:", mensaje)
+        print("Telefono recibido:", telefono)
+
+        if not mensaje or not telefono:
+            print("Faltan datos")
+            return "OK", 200
+    
+        try:
+            texto_respuesta = respuesta_ia_whatsapp(mensaje)
+        except Exception as e:
+            print("Error IA:", e)
+            texto_respuesta = "Ahora mismo no puedo responder, pero puedes reservar aquí: https://my-primer-programa.onrender.com"
+
         print("Respuesta IA:", texto_respuesta)
 
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
@@ -433,10 +438,11 @@ def whatsapp_webhook():
 
         print("SID Twilio:", respuesta.sid)
 
+        return "OK", 200
+
     except Exception as e:
         print("Error webhook WhatsApp:", e)
-
-    return "OK", 200
+        return "OK", 200
 
 if __name__ == "__main__":
     import os
