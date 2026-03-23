@@ -43,12 +43,59 @@
             margin-top: 20px;
         }
 
-        .cita {
-            border: 1px solid #e5e5e5;
-            border-radius: 14px;
+        .dia {
+            background: white;
+            border-radius: 10px;
             padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dia h3 {
+            margin-top: 0;
             margin-bottom: 12px;
-            background: #fafafa;
+        }
+
+        .cita {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .pendiente {
+            background: #fff3cd;
+        }
+
+        .confirmada {
+            background: #d4edda;
+        }
+
+        .hora {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .botones {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-ok {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .btn-x {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
 
         .fila {
@@ -122,48 +169,50 @@
         <div class="seccion">
             <h2>Pendientes</h2>
 
-            {% if pendientes %}
-                {% for cita in pendientes %}
-                    </div class="cita">
-                        <div class="titulo-dia">{{ cita[0] }} </div>
-                        <div class="fila">
-                            <div class="datos">
-                                <div class="dato"><strong>Hora:</strong> {{ cita[1] }}</div>
-                                <div class="dato"><strong>Nombre:</strong> {{ cita[2] }}</div>
-                                <div class="dato"><strong>Teléfono:</strong> {{ cita[3] }}</div>
-                                <div class="dato"><strong>Estado:</strong> {{ cita[4] }}</div>
+            {% if pendientes_agrupadas %}
+                {% for dia, citas_dia in pendientes_agrupadas.items() %}
+                    </div class="dia">
+                        <h3>{{ dia }}</h3>
+
+                        {% for citas in citas_dia %}
+                            <div class="cita pendiente">
+                                <div>
+                                    <span class="hora">{{ cita.hora }}</span>
+                                    <strong>{{ cita.nombre }} </strong> {{ cita.telefono }}
                             </div>
                 
-                            <div class="acciones">
-                                <a href="/confirmar/{{ cita[0] }}/{{ cita[1] }}">✅</a>
-                                <a href="/cancelar/{{ cita[0] }}/{{ cita[1] }}">❌</a>
+                            <div class="botones">
+                                <a href="/confirmar/{{ cita.dia }}/{{ cita.hora }}">✅</a>
+                                <a href="/cancelar/{{ cita.dia }}/{{ cita.hora }}">❌</a>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="vacio">No hay citas pendientes.</p>
+                <p>No hay citas pendientes.</p>
             {% endif %}
         </div>
         <div class="seccion">
             <h2>Confirmadas</h2>
             
-            {% if confirmadas %}
-                {% for cita in confirmadas %}
-                    <div class="cita">
-                        <div class="titulo-dia">{{ cita[0] }} </div>
-                        <div class="fila">
-                            <div class="datos">
-                                <div class="dato"><strong>Hora:</strong> {{ cita[1] }}</div>
-                                <div class="dato"><strong>Nombre:</strong> {{ cita[2] }}</div>
-                                <div class="dato"><strong>Teléfono:</strong> {{ cita[3] }}</div>
-                                <div class="dato"><strong>Estado:</strong> {{ cita[4] }}</div>
-                            </div>
+            {% if confirmadas_agrupadas %}
+                {% for dia, citas_dia in confirmadas_agrupadas.itmes() %}
+                    <div class="dia">
+                        <h3>{{ dia }} </h3>
 
-                            <div class="acciones">
-                                <a href="/cancelar/{{ cita[0] }}/{{ cita[1] }}">❌</a>
+                        {% for cita in citas_dia %}
+                            <div class="cita confirmada">
+                                <div>
+                                    <span class="hora">{{ cita.hora }}</span>
+                                    <strong>{{ cita.nombre }}</strong> · {{ cita.telefono }}
+                                </div>
+
+                                <div class="botones">
+                                    <a href="/cancelar/{{ cita.dia }}/{{ cita.hora }}">❌</a>
+                                </div>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 {% endfor %}
             {% else %}

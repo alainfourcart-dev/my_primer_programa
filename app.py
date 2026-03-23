@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
+from collections import defaultdict
 from datetime import datetime, timedelta, date
 from twilio.rest import Client
 from openai import OpenAI 
@@ -341,9 +342,33 @@ def admin():
     pendientes = [c for c in citas if c[4] == "pendiente"]
     confirmadas = [c for c in citas if c[4] == "confirmada"]
 
-    conexion.close()
+    def agrupar_por_dia(lista_citas):
+        dias = defaultdict(list)
 
-    return render_template("admin.html", pendientes=pendientes, confirmadas=confirmadas)
+        for cita in lista_citas:
+            dia_str, hora, nombre, telefono, estado = cita
+
+            fecha_obj = datetime.strptime(dia_str, "%Y-%m-%d")
+            nombres_dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+            dia_bonito = f"{nombres_dias[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
+
+            dias[dia_bonito].append({
+                "dia": dia_str,
+                "hora": hora,
+                "nombre": nombre,
+                "telefono": telefono,
+                "estado": estado
+            })
+        return dict(dias)
+
+    pendientes_agrupadas = agrupar_por_dia(pendientes)
+    confirmadas_agrupadas = agrupar_por_dia(confirmadas)
+
+    return render_template(
+        "admin.html",
+        pendientes_agrupadas=pendientes_agrupadas,
+        confirmadas_agrupadas=confirmadas_agrupadas
+    )
 
 @app.route("/logout")
 def logout():
