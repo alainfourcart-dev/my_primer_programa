@@ -338,6 +338,7 @@ def admin():
         ORDER BY dia, hora
     """)
     citas = cursor.fetchall()
+    citas = sorted(citas, key=lambda x: (x[0], [1]))
 
     pendientes = [c for c in citas if c[4] == "pendiente"]
     confirmadas = [c for c in citas if c[4] == "confirmada"]
@@ -350,7 +351,15 @@ def admin():
 
             fecha_obj = datetime.strptime(dia_str, "%Y-%m-%d")
             nombres_dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-            dia_bonito = f"{nombres_dias[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
+            hoy = date.today()
+            mañana = hoy + timedelta(days=1)
+
+            if fecha_obj.date() == hoy:
+                dia_bonito = "Hoy"
+            elif fecha_obj.date() == mañana:
+                dia_bonito = "Mañana"
+            else:
+                dia_bonito = f"{nombres_dias[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
 
             dias[dia_bonito].append({
                 "dia": dia_str,
