@@ -197,7 +197,7 @@
             <h2>Confirmadas</h2>
             
             {% if confirmadas_agrupadas %}
-                {% for dia, citas_dia in confirmadas_agrupadas.itmes() %}
+                {% for dia, citas_dia in confirmadas_agrupadas.items() %}
                     <div class="dia">
                         <h3>{{ dia }}</h3>
 
