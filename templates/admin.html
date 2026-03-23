@@ -177,15 +177,15 @@
                         {% for citas in citas_dia %}
                             <div class="cita pendiente">
                                 <div>
-                                    <span class="hora">{{ cita.hora }}</span>
-                                    <strong>{{ cita.nombre }} </strong> {{ cita.telefono }}
-                            </div>
+                                    <span class="hora">{{ cita["hora"] }}</span>
+                                    <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                </div>
                 
-                            <div class="botones">
-                                <a href="/confirmar/{{ cita.dia }}/{{ cita.hora }}">✅</a>
-                                <a href="/cancelar/{{ cita.dia }}/{{ cita.hora }}">❌</a>
+                                <div class="botones">
+                                    <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}">✅</a>
+                                    <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}">❌</a>
+                                </div>
                             </div>
-                        </div>
                         {% endfor %}
                     </div>
                 {% endfor %}
@@ -199,17 +199,17 @@
             {% if confirmadas_agrupadas %}
                 {% for dia, citas_dia in confirmadas_agrupadas.itmes() %}
                     <div class="dia">
-                        <h3>{{ dia }} </h3>
+                        <h3>{{ dia }}</h3>
 
                         {% for cita in citas_dia %}
                             <div class="cita confirmada">
                                 <div>
-                                    <span class="hora">{{ cita.hora }}</span>
-                                    <strong>{{ cita.nombre }}</strong> · {{ cita.telefono }}
+                                    <span class="hora">{{ cita["hora"] }}</span>
+                                    <strong>{{ cita["nombre"] }}</strong> · {{ cita["telefono"] }}
                                 </div>
 
                                 <div class="botones">
-                                    <a href="/cancelar/{{ cita.dia }}/{{ cita.hora }}">❌</a>
+                                    <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}">❌</a>
                                 </div>
                             </div>
                         {% endfor %}
