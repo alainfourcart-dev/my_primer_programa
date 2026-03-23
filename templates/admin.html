@@ -170,7 +170,8 @@
             <h2>Pendientes</h2>
 
             {% if pendientes_agrupadas %}
-                {% for dia, citas_dia in pendientes_agrupadas.items() %}
+                {% for dia in pendientes_agrupadas %}
+                    {% set citas_dia = pendientes_agrupadas[dia] %}
                     </div class="dia">
                         <h3>{{ dia }}</h3>
 
@@ -197,7 +198,8 @@
             <h2>Confirmadas</h2>
             
             {% if confirmadas_agrupadas %}
-                {% for dia, citas_dia in confirmadas_agrupadas.items() %}
+                {% for dia in confirmadas_agrupadas %}
+                    {% set citas_dia = confirmadas_agrupadas[dia] %}
                     <div class="dia">
                         <h3>{{ dia }}</h3>
 
