@@ -2,121 +2,174 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de citas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda administrador</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f5f1e8;
             margin: 0;
-            padding: 30px;
+            padding: 20px;
         }
 
-        .contenedor {
+        .panel {
             max-width: 1000px;
             margin: 0 auto;
             background: white;
-            border-radius: 14px;
-            padding: 24px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            border-radius: 18px;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 42px;
         }
 
         h2 {
-            margin-top: 0;
+            margin-top: 35px;
+            font-size: 28px;
+        }
+
+        .logout {
+            display: inline-block;
             margin-bottom: 20px;
-            font-size: 32px;
+            text-decoration: none;
+            color: #222;
+            font-weight: bold;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            overflow: hidden;
-            border-radius: 10px;
+        .seccion {
+            margin-top: 20px;
         }
 
-        th, td {
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        th {
-            background: #111827;
-            color: white;
-        }
-
-        tr:hover {
+        .cita {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 12px;
             background: #fafafa;
         }
 
-        .estado {
-            font-weight: bold;
-            padding: 6px 10px;
-            border-radius: 999px;
-            display: inline-block;
-            font-size: 14px;
+        .fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .pendiente {
-            background: #fff3cd;
-            color: #856404;
+        .datos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 16px;
         }
 
-        .confirmada {
-            background: #d4edda;
-            color: #155724;
+        .dato {
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px 12px;
+            border: 1px solid #ececec;
         }
 
         .acciones a {
             text-decoration: none;
-            font-size: 20px;
+            font-size: 24px;
             margin-right: 10px;
         }
 
+        .titulo-dia {
+            font-size: 22px;
+            margin: 28px 0 12px;
+            color: #111;
+        }
+
         .vacio {
-            margin-top: 20px;
             color: #666;
+            font-size: 18px;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 10px;
+            }
+            .panel {
+                padding: 16px;
+            }
+            h1 {
+                font-size: 32px;
+            }
+            h2 {
+                font-size: 24px;
+            }
+            .fila {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .acciones a {
+                margin-left: 0;
+                margin-right: 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="contenedor">
-        <h2>Panel de citas</h2>
-        <a href="/logout" style="display.inline-block; margin-bottom: 20px; text-decoration: none; color: #333;">
-            Cerrar sesión 
-        </a>
+    <div class="panel">
+        <h1>Agenda de citas</h1>
+        <a class="/logout" href="/logout">Cerrar sesión</a>
 
-        {% if citas%}
-        <table>
-            <tr>
-                <th>Día</th>
-                <th>Hora</th>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
+        <div class="seccion">
+            <h2>Pendientes</h2>
+
+            {% if pendientes %}
+                {% for cita in pendientes %}
+                    </div class="cita">
+                        <div class="titulo-dia">{{ cita[0] }} </div>
+                        <div class="fila">
+                            <div class="datos">
+                                <div class="dato"><strong>Hora:</strong> {{ cita[1] }}</div>
+                                <div class="dato"><strong>Nombre:</strong> {{ cita[2] }}</div>
+                                <div class="dato"><strong>Teléfono:</strong> {{ cita[3] }}</div>
+                                <div class="dato"><strong>Estado:</strong> {{ cita[4] }}</div>
+                            </div>
+                
+                            <div class="acciones">
+                                <a href="/confirmar/{{ cita[0] }}/{{ cita[1] }}">✅</a>
+                                <a href="/cancelar/{{ cita[0] }}/{{ cita[1] }}">❌</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="vacio">No hay citas pendientes.</p>
+            {% endif %}
+        </div>
+        <div class="seccion">
+            <h2>Confirmadas</h2>
             
-            {% for cita in citas %}
-            <tr>
-                <td>{{ cita [0] }} </td>
-                <td>{{ cita [1] }} </td>
-                <td>{{ cita [2] }} </td>
-                <td>{{ cita [3] }} </td>
-                <td>
-                    <span class="estado {{ cita [4] }}">
-                        {{ cita [4] }}
-                    </span>
-                </td>
-                <td class="acciones">
-                    <a href="/confirmar/{{cita[0] }}/{{ cita[1] }}">✅</a>
-                    <a href="/cancelar/{{cita[0] }}/{{ cita[1] }}">❌</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-            <p class="vacio">No hay citas registradas.</p>
-        {% endif %}
+            {% if confirmadas %}
+                {% for cita in confirmadas %}
+                    <div class="cita">
+                        <div class="titulo-dia">{{ cita[0] }} </div>
+                        <div class="fila">
+                            <div class="datos">
+                                <div class="dato"><strong>Hora:</strong> {{ cita[1] }}</div>
+                                <div class="dato"><strong>Nombre:</strong> {{ cita[2] }}</div>
+                                <div class="dato"><strong>Teléfono:</strong> {{ cita[3] }}</div>
+                                <div class="dato"><strong>Estado:</strong> {{ cita[4] }}</div>
+                            </div>
+
+                            <div class="acciones">
+                                <a href="/cancelar/{{ cita[0] }}/{{ cita[1] }}">❌</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="vacio">No hay citas confirmadas.</p>
+            {% endif %}
+        </div>
     </div>
 <body>
 </html>

@@ -331,12 +331,19 @@ def admin():
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
-    cursor.execute("SELECT dia, hora, nombre, telefono, estado FROM citas ORDER BY dia, hora")
+    cursor.execute("""
+        SELECT dia, hora, nombre, telefono, estado
+        FROM citas
+        ORDER BY dia, hora
+    """)
     citas = cursor.fetchall()
+
+    pendientes = [c for c in citas if c[4] == "pendiente"]
+    confirmadas = [c for c in citas if c[4] == "confirmada"]
 
     conexion.close()
 
-    return render_template("admin.html", citas=citas)
+    return render_template("admin.html", pendientes=pendientes, confirmadas=confirmadas)
 
 @app.route("/logout")
 def logout():
