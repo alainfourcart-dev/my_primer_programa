@@ -45,6 +45,15 @@ def inicializar_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS cierres (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fecha_inicio TEXT NOT NULL,
+            fecha_fin TEXT NOT NULL,
+            motivo TEXT
+        )
+    """)
+
     conexion.commit()
     conexion.close()
 
@@ -73,6 +82,22 @@ def cargar_citas():
 
     citas = [f"{dia}|{hora}" for dia, hora in filas]
     return citas
+
+def fecha_esta_cerrada(fecha_str):
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT 1
+        FROM cierres
+        WHERE ? BETWEEN fecha_inicio AND fecha_fin
+        LIMIT 1
+    """, (fecha_str,))
+
+    resultado = cursor.fetchone()
+    conexion.close()
+
+    return resultado is not None
 
 def guardar_cita(fecha, hora, nombre, telefono):
     conexion = sqlite3.connect("citas.db")
@@ -179,6 +204,11 @@ def obtener_disponibilidad():
 
     for i in range (30):
         fecha = hoy + timedelta(days=i)
+        fecha_str = fecha.strftime("%Y-%m-%d")
+
+        if fecha_esta_cerrada(fecha_str):
+            continue
+
         nombre_dia = DIAS_ES[fecha.weekday()]
 
         if nombre_dia not in ["Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]:
@@ -484,6 +514,17 @@ def whatsapp_webhook():
     except Exception as e:
         print("Error webhook WhatsApp:", e)
         return "OK", 200
+    
+conexion = sqlite3.connect("citas.db")
+cursor = conexion.cursor()
+
+cursor.execute("""
+INSERT INTO cierres (fecha_inicio, fecha_fin, motivo)
+VALUES (?, ?, ?)
+""", ("2026-04-02", "2026-04-03", "Semana Santa"))
+
+conexion.commit()
+conexion.close()
 
 if __name__ == "__main__":
     import os
