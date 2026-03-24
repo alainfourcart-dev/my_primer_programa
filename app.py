@@ -62,6 +62,14 @@ def inicializar_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS bloqueos_especiales (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fecha TEXT NOT NULL,
+            hora TEXT NOT NULL
+        )
+    """)
+
     conexion.commit()
     conexion.close()
 
@@ -114,6 +122,22 @@ def hora_liberada(fecha_str, hora):
     cursor.execute("""
         SELECT 1
         FROM liberaciones
+        WHERE fecha = ? AND hora = ?
+        LIMIT 1
+    """, (fecha_str, hora))
+
+    resultado = cursor.fetchone()
+    conexion.close()
+
+    return resultado is not None
+
+def hora_bloqueada_especial(fecha_str, hora):
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT 1
+        FROM bloqueos_especiales
         WHERE fecha = ? AND hora = ?
         LIMIT 1
     """, (fecha_str, hora))
@@ -548,14 +572,6 @@ def whatsapp_webhook():
     
 conexion = sqlite3.connect("citas.db")
 cursor = conexion.cursor()
-
-cursor.execute("""
-INSERT INTO liberaciones (fecha, hora)
-VALUES (?, ?)
-""", ("2026-04-09", "17:00"))
-
-conexion.commit()
-conexion.close()
 
 if __name__ == "__main__":
     import os
