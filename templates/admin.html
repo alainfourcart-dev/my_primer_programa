@@ -170,6 +170,66 @@
             color: white;
             cursor: pointer;
         }
+        .acciones-calendario {
+            display: grid;
+            grid-template-columns: repeat (3, 1fr);
+            gap: 16px;
+            margin: 20px 0 24px 0;
+        }
+        .boton-accion {
+            background: #111827;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .boton-accion:hover {
+            opacity: 0.92;
+        }
+        .panel-formulario {
+            display: none;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+        .panel-formulario.activo {
+            display: block;
+        }
+        .panel-formulario h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+        .panel-formulario form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .panel-formulario input,
+        .panel-formulario button {
+            padding: 10px 12px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+        .panel-formulario input {
+            border: 1px solid #ccc;
+        }
+        .panel-formulario button {
+            border: none;
+            background: #111827;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .acciones-calendario {
+                grid-template-columns: 1fr;
+            }
+        }
 
         @media (max-width: 900px) {
             .herramientas-admin {
@@ -198,6 +258,19 @@
         }
     </style>
 </head>
+<script>
+function mostrarPanel(idPanel) {
+    const paneles = document.querySelectorAll('.panel-formulario');
+
+    paneles.forEach(panel => {
+        if (panel.id === idPanel) {
+            panel.classList.toggle('activo');
+        } else {
+            panel.classList.remove('activo');
+        }
+    });
+}
+</script>
 <body>
     <div class="panel">
         <h1>Agenda de citas</h1>
@@ -206,23 +279,42 @@
         <div class="seccion">
             <h2>Gestión de calendario</h2>
 
-            <div class="herramientas-admin">
-                <form action="/admin/cierre" method="POST" class="bloque-form-admin">
-                    <h3>Cerrar fechas</h3>
+            <div class="acciones-calendario">
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-cierre')">
+                    Cerrar fechas
+                </button>
+                
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-liberar')">
+                    Liberar cita fija
+                </button>
+
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-bloquear')">
+                    Bloquear hora especial
+                </button>
+            </div>
+
+            <div id="panel-cierre" class="panel-formulario">
+                <h3>Cerrar fechas</h3>
+                <form action="/admin/cierre" method="POST">
                     <input type="date" name="fecha_inicio" required>
                     <input type="date" name="fecha_fin" required>
-                    <input type="text" name="motivo" placeholder="Motivo (vacaciones, festivo...)">
+                    <input type="text" name="motivo" placeholder="Motivo (vacaciones, festivo...)" required>
                     <button type="submit">Guardar cierre</button>
                 </form>
+            </div>
 
-                <form action="/admin/liberar" method="POST" class="bloque-form-admin">
-                    <h3>Liberar cita fija</h3>
+            <div id="panel-liberar" class="panel-formulario">
+                <h3>Liberar cita fija</h3>
+                <form action="/admin/liberar" method="POST">
                     <input type="date" name="fecha" required>
                     <input type="time" name="hora" required>
                     <button type="submit">Liberar hora</button>
                 </form>
+            </div>
 
-                <form action="/admin/bloquear" method="POST" class="bloque-form-admin">
+            <div id="panel-bloquear" class="panel-formulario">
+                <h3>Bloquear hora especial</h3>
+                <form action="/admin/bloquear" method="POST">
                     <h3>Bloquear hora especial</h3>
                     <input type="date" name="fecha" required>
                     <input type="time" name="hora" required>
