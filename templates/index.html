@@ -9,99 +9,90 @@
             font-family: Arial;
             background: #ece5dd;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
         .chat {
             width: 100%;
-            max-width: 100%;
+            max-width: 900%;
+            margin: 0 auto;
             background: #fff;
-            border-radius: 0;
-            padding: 15px;
+            border-radius: 16px;
+            padding: 20px;
             box-sizing: border-box;
         }
-        input, button {
+        .dia-bloque {
+            background: #f8f8f8;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .dia-bloque h3 {
+            margin: 0 0 12px 0;
+            font-size: 24px;
+        }
+        .campos-cita {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .campos-cita input {
+            width: 100%;
+            max-width: 420px;
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+        .bloque-horas {
+            margin-top: 14px;
+        }
+        .bloque-horas h4 {
+            margin: 0 0 8px 0;
             font-size: 16px;
         }
-        .bot {
-            background: #e4e6eb;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 5px 0;
+        .fila-horas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
         }
-        .user {
-            background: #dcf8c6;
-            padding: 10px;
-            border-radius: 10px;
-            margin: 5px 0;
-            text-align: right;
-        }
-
-        input {
-            width: 70%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            padding: 10px;
-            border: none;
-            background: black;
-            color: white;
-            border-radius: 8px;
-        }   
-
-        .respuesta-reserva{
-            background: #e8f7e8;
-            border: 1px solid #b7e4b8;
-            color: #1f5f2c;
-        }    
-
         .hora-btn{
-            margin:3px;
-            padding:8px 10px;
+            padding:10px 12px;
             border:none;
-            border-radius:8px;
+            border-radius:10px;
             background: #111827;
             color:white;
             cursor:pointer;
-            font-size:14px;
+            font-size:16px;
+            min-width: 70px;
         }
-
         .hora-btn-hover{
-            background: #374151;
+            opacity: 0.9;
         }
 
-        .bloque-dia{
-            margin-bottom:18px;
-            padding: 10px;
-            background: #f8f8f8;
-            border-radius: 10px;
-        }
-
-        .titulo-dia{
-            display:block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        .respuesta {
-            margin-top: 12px;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 500;
-        }
-
-        .respuesta.ok {
-            background: #eaf7e7;
-            color: #2d6a2d;
-            border: 1px solid #cfe8c8;
-        }
-
-        .respuesta.error {
-            background: #fdeaea;
-            color: #a33a3a;
-            border: 1px solid #f5c2c2;
+        @media (max-width: 700px) {
+            body {
+                padding: 10px;
+            }
+            .chat {
+                padding: 14px;
+            }
+            .dia-bloque h3 {
+                font-size: 20px;
+            }
+            .campos-cita input {
+                max-width: 100%;
+            }
+            .fila-horas {
+                gap: 8px;
+            }
+            .hora-btn {
+                min-width: 64px;
+                font-size: 15px;
+                padding: 9px 10px;
+            }
         }
 
     </style>
@@ -135,26 +126,45 @@
 <h3>Disponibilidad</h3>
 
 {% for etiqueta, info in disponibilidad.items() %}
-<div class="bloque-dia">
-    <span class="titulo-dia">{{ etiqueta }}</span>
+<div class="dia-bloque">
+    <h3>{{ etiqueta }}</h3>
 
     <form method="POST">
         <input type="hidden" name="dia" value="{{ info.fecha }}">
 
-        <input type="text" name="nombre" placeholder="Tu nombre" required>
-        <input type="text" name="telefono" placeholder="Tu telefono" required>
+        <div class="campos-cita">
+            <input type="text" name="nombre" placeholder="Tu nombre" required>
+            <input type="text" name="telefono" placeholder="Tu telefono" required>
+        </div>
 
-        {% for hora in info.horas %}
-            <button type="submit" name="hora" value="{{ hora }}" class="hora-btn">
-                {{ hora }}
-            </button>
-        {% endfor %}
+        <div class="bloque-horas">
+            <h4>Mañana</h4>
+            <div class="fila-horas">
+                {% for hora in info.horas %}
+                    {% if hora < "14:00" %}
+                        <button type="submit" name="hora" value="{{ hora }}" class="hora-btn">
+                            {{ hora }}
+                        </button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
 
+        <div class="bloque-horas">
+            <h4>Tarde</h4>
+            <div class="fila-horas">
+                {% for hora in info.horas %}
+                    {% if hora >= "14:00" %}
+                        <button type="submit" name="hora" value="{{ hora }}" class="hora-btn">
+                            {{ hora }}
+                        </button>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
     </form>
 </div>
-{% endfor %}  
-
-</div>
+{% endfor %}
 
 </body>
 </html>
