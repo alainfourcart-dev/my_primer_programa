@@ -134,12 +134,12 @@
 <body>
 
 <div class="chat">
-<div class="header">
-    <h1>💈 Rocha Peluqueros</h1>
-    {% for mensaje in bienvenida %}
-        <p>{{ mensaje }}</p>
-    {% endfor %}
-
+    <div class="header">
+        <h1>💈 Rocha Peluqueros</h1>
+        {% for mensaje in bienvenida %}
+            <p>{{ mensaje }}</p>
+        {% endfor %}
+    </div>
     <div class="chat-input">
         <input type="text" placeholder="Escribe tu mensaje...">
         <button>Enviar</button>
