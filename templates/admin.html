@@ -138,9 +138,9 @@
             font-size: 18px;
         }
         .herramientas_admin {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            flex-wrap: wrap;
             margin: 20px 0 30px 0;
         }
         .bloque-form-admin {
@@ -148,7 +148,6 @@
             border: 1px solid #e5e5e5;
             border-radius: 14px;
             padding: 16px;
-            width: 280px;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -172,7 +171,10 @@
             cursor: pointer;
         }
 
-        @media (max-width: 700px) {
+        @media (max-width: 900px) {
+            .herramientas-admin {
+                grid-template-columns: 1fr;
+            }
             body {
                 padding: 10px;
             }
