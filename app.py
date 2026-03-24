@@ -54,6 +54,14 @@ def inicializar_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS liberaciones(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            fecha TEXT NOT NULL
+            hora TEXT NOT NULL
+        )
+    """)
+
     conexion.commit()
     conexion.close()
 
@@ -514,17 +522,6 @@ def whatsapp_webhook():
     except Exception as e:
         print("Error webhook WhatsApp:", e)
         return "OK", 200
-    
-conexion = sqlite3.connect("citas.db")
-cursor = conexion.cursor()
-
-cursor.execute("""
-INSERT INTO cierres (fecha_inicio, fecha_fin, motivo)
-VALUES (?, ?, ?)
-""", ("2026-04-02", "2026-04-03", "Semana Santa"))
-
-conexion.commit()
-conexion.close()
 
 if __name__ == "__main__":
     import os
