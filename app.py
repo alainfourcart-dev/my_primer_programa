@@ -257,10 +257,10 @@ def obtener_disponibilidad():
     c = conn.cursor()
     c.execute("SELECT fecha_inicio, fecha_fin FROM cierres")
     cierres = c.fetchall()
-    c.execute("SELECT fecha, hora FROM bloqueos")
-    blqueos = c.fetchall()
+    c.execute("SELECT fecha, hora FROM bloqueos_especiales")
+    bloqueos = c.fetchall()
     c.execute("SELECT fecha, hora FROM liberadas")
-    liberas = c.fetchall()
+    liberadas = c.fetchall()
 
     conn.close()
 
