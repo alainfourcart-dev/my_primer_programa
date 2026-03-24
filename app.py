@@ -272,9 +272,26 @@ def generar_horas(inicio, fin, intervalo=40, primera_diferente=False):
 
     return horas
 
+def esta_cerrado (dia, cierres):
+    for inicio, fin in cierres:
+        if inicio <= dia <= fin:
+            return True
+        return False
+
 def obtener_disponibilidad():
     citas_ocupadas = cargar_citas()
     disponibilidad = {}
+
+    conn = sqlite3.connect("agenda.db")
+    c = conn.cursor()
+    c.execute("SELECT fecha_inicio, fecha_fin FROM cierres")
+    cierres = c.fetchall()
+    c.execute("SELECT fecha, hora FROM bloqueos")
+    blqueos = c.fetchall()
+    c.execute("SELECT fecha, hora FROM liberadas")
+    liberas = c.fetchall()
+
+    conn.close()
 
     horas_manana = generar_horas ("10:00", "14:00", 40)
     horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
@@ -284,11 +301,10 @@ def obtener_disponibilidad():
     for i in range (30):
         fecha = hoy + timedelta(days=i)
         fecha_str = fecha.strftime("%Y-%m-%d")
-
-        if fecha_esta_cerrada(fecha_str):
-            continue
-
         nombre_dia = DIAS_ES[fecha.weekday()]
+
+        if esta_cerrado(fecha_str, cierres):
+            continue
 
         if nombre_dia not in ["Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]:
             continue
@@ -297,8 +313,6 @@ def obtener_disponibilidad():
             todas = horas_manana
         else:
             todas = horas_manana + horas_tarde
-
-        fecha_str = fecha.strftime("%Y-%m-%d")
 
         bloqueadas = BLOQUEOS_FIJOS.get(nombre_dia, [])
         bloqueadas = [
@@ -313,10 +327,11 @@ def obtener_disponibilidad():
         for hora in todas:
             clave = f"{fecha_str}|{hora}"
 
+            bloqueado_db = (fecha_str, hora) in bloqueos
+            liberado_db = (fecha_str,hora) in liberadas
             if (
-                clave not in citas_ocupadas
-                and hora not in bloqueadas
-                and not hora_bloqueada_especial(fecha_str, hora)
+                (clave not in citas_ocupadas and hora not in bloqueadas and not bloqueado_db)
+                or liberado_db
             ):
                 libres.append(hora)
 
