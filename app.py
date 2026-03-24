@@ -468,7 +468,7 @@ def admin():
         confirmadas_agrupadas=confirmadas_agrupadas
     )
 
-@app.route("/admin/cierre", methods=[POST])
+@app.route("/admin/cierre", methods=["POST"])
 def admin_cierre():
     if not session.get("admin"):
         return redirect ("/login")
