@@ -552,7 +552,7 @@ cursor = conexion.cursor()
 cursor.execute("""
 INSERT INTO liberaciones (fecha, hora)
 VALUES (?, ?)
-""", ("2026-04-07", "17:00"))
+""", ("2026-04-09", "17:00"))
 
 conexion.commit()
 conexion.close()
