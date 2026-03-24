@@ -106,7 +106,6 @@ def inicializar_db():
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
-init_db()
 
 inicializar_db()
 
