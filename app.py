@@ -57,7 +57,7 @@ def inicializar_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS liberaciones(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fecha TEXT NOT NULL
+            fecha TEXT NOT NULL,
             hora TEXT NOT NULL
         )
     """)
