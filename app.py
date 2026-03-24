@@ -107,7 +107,7 @@ def fecha_esta_cerrada(fecha_str):
 
     return resultado is not None
 
-def hora_liberada(fecha.str, hora):
+def hora_liberada(fecha_str, hora):
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
