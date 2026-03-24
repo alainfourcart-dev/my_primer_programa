@@ -578,7 +578,7 @@ conexion = sqlite3.connect("citas.db")
 cursor = conexion.cursor()
 
 conexion = sqlite3.connect("citas.db")
-cursor 0 conexion.cursor()
+cursor = conexion.cursor()
 
 cursor.execute("""
 INSERT INTO bloqueos_especiales (fecha, hora)
