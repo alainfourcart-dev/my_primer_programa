@@ -282,7 +282,11 @@ def obtener_disponibilidad():
         for hora in todas:
             clave = f"{fecha_str}|{hora}"
 
-            if clave not in citas_ocupadas and hora not in bloqueadas:
+            if (
+                clave not in citas_ocupadas
+                and hora not in bloqueadas
+                and not hora_bloqueada_especial(fecha_str, hora)
+            ):
                 libres.append(hora)
 
         disponibilidad[etiqueta] = {
@@ -572,6 +576,17 @@ def whatsapp_webhook():
     
 conexion = sqlite3.connect("citas.db")
 cursor = conexion.cursor()
+
+conexion = sqlite3.connect("citas.db")
+cursor 0 conexion.cursor()
+
+cursor.execute("""
+INSERT INTO bloqueos_especiales (fecha, hora)
+VALUES (?, ?)
+""", ("2026-04-07", "17:00"))
+
+conexion.commit()
+conexion.close()
 
 if __name__ == "__main__":
     import os
