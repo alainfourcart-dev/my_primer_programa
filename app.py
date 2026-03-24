@@ -468,6 +468,64 @@ def admin():
         confirmadas_agrupadas=confirmadas_agrupadas
     )
 
+@app.route("/admin/cierre", methods=[POST])
+def admin_cierre():
+    if not session.get("admin"):
+        return redirect ("/login")
+
+    fecha_inicio = request.form.get("fecha_inicio")
+    fecha_fin = request.form.get("fecha_fin")
+    motivo = request.form.get("motivo", "")
+
+    if fecha_inicio and fecha_fin:
+        conexion = sqlite3.connect("citas.db")
+        cursor = conexion.cursor()
+        cursor.execute("""
+            INSERT INTO cierres (fecha_inicio, fecha_fin, motivo)
+            VALUES (?, ?, ?)
+        """, (fecha_inicio, fecha_fin, motivo))
+        conexion.commit()
+        conexion.close()
+    return redirect("/admin")
+
+@app.route("/admin/liberar", methods=["POST"])
+def admin_liberar():
+    if not session.get("admin"):
+        return redirect ("/login")
+
+    fecha = request.form.get("fecha")
+    hora = request.form.get("hora")
+
+    if fecha and hora:
+        conexion = sqlite3.connect("citas.db")
+        cursor = conexion.cursor()
+        cursor.execute("""
+            INSERT INTO liberaciones (fecha, hora)
+            VALUES (?, ?)
+        """, (fecha, hora))
+        conexion.commit()
+        conexion.close()
+    return redirect("/admin")
+
+@app.route("/admin/bloquear", methods=["POST"])
+def admin_bloquear():
+    if not session.get("admin"):
+        return redirect ("/login")
+
+    fecha = request.form.get("fecha")
+    hora = request.form.get("hora")
+
+    if fecha and hora:
+        conexion = sqlite3.connect("citas.db")
+        cursor = conexion.cursor()
+        cursor.execute("""
+            INSERT INTO bloqueos_especiales (fecha, hora)
+            VALUES (?, ?)
+        """, (fecha, hora))
+        conexion.commit()
+        conexion.close()
+    return redirect("/admin")
+
 @app.route("/logout")
 def logout():
     session.pop("admin", None)

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agenda administrador</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -136,6 +137,40 @@
             color: #666;
             font-size: 18px;
         }
+        .herramientas_admin {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0 30px 0;
+        }
+        .bloque-form-admin {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 16px;
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bloque-form-admin h3 {
+            margin: 0 0 6px 0;
+        }
+        .bloque-form-admin input,
+        .bloque-form-admin button {
+            padding: 10px 12px;
+            font-size: 15px;
+            border-radius: 10px;
+        }
+        .bloque-form-admin input {
+            border: 1px solid #ccc;
+        }
+        .bloque-form-admin button {
+            border: none;
+            background: #111827;
+            color: white;
+            cursor: pointer;
+        }
 
         @media (max-width: 700px) {
             body {
@@ -165,6 +200,34 @@
     <div class="panel">
         <h1>Agenda de citas</h1>
         <a class="/logout" href="/logout">Cerrar sesión</a>
+
+        <div class="seccion">
+            <h2>Gestión de calendario</h2>
+
+            <div class="herramientas-admin">
+                <form action="/admin/cierre" method="POST" class="bloque-form-admin">
+                    <h3>Cerrar fechas</h3>
+                    <input type="date" name="fecha_inicio" required>
+                    <input type="date" name="fecha_fin" required>
+                    <input type="text" name="motivo" placeholder="Motivo (vacaciones, festivo...)">
+                    <button type="submit">Guardar cierre</button>
+                </form>
+
+                <form action="/admin/liberar" method="POST" class="bloque-form-admin">
+                    <h3>Liberar cita fija</h3>
+                    <input type="date" name="fecha" required>
+                    <input type="time" name="hora" required>
+                    <button type="submit">Liberar hora</button>
+                </form>
+
+                <form action="/admin/bloquear" method="POST" class="bloque-form-admin">
+                    <h3>Bloquear hora especial</h3>
+                    <input type="date" name="fecha" required>
+                    <input type="time" name="hora" required>
+                    <button type="submit">Bloquear hora</button>
+                </form>
+            </div>
+        </div>
 
         <div class="seccion">
             <h2>Pendientes</h2>

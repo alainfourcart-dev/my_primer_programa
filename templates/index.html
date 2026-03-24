@@ -139,22 +139,23 @@
         {% for mensaje in bienvenida %}
             <p>{{ mensaje }}</p>
         {% endfor %}
-    </div>
-    <div class="chat-input">
-        <input type="text" placeholder="Escribe tu mensaje...">
-        <button>Enviar</button>
-    </div>
-</div>
 
-{% if pregunta %}
-<div class="user">{{ pregunta }}</div>
-{% endif %}
+        <form method="POST" class="chat-input">
+            <input type="text" name="pregunta" placeholder="Escribe aquí tu mensaje" required>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
 
-{% if respuesta %}
+    {% if pregunta %}
+    <div class="user">{{ pregunta }}</div>
+    {% endif %}
+
+    {% if respuesta %}
     <div class="respuesta {{ tipo_respuesta }}">
         {{ respuesta }}
     </div>
-{% endif %}
+    {% endif %}
+</div>
 
 <h3>Disponibilidad</h3>
 
