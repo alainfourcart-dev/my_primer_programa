@@ -107,6 +107,22 @@ def fecha_esta_cerrada(fecha_str):
 
     return resultado is not None
 
+def hora_liberada(fecha.str, hora):
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT 1
+        FROM liberaciones
+        WHERE fecha = ? AND hora = ?
+        LIMIT 1
+    """, (fecha_str, hora))
+
+    resultado = cursor.fetchone()
+    conexion.close()
+
+    return resultado is not None
+
 def guardar_cita(fecha, hora, nombre, telefono):
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
@@ -226,7 +242,14 @@ def obtener_disponibilidad():
             todas = horas_manana
         else:
             todas = horas_manana + horas_tarde
+
+        fecha_str = fecha.strftime("%Y-%m-%d")
+
         bloqueadas = BLOQUEOS_FIJOS.get(nombre_dia, [])
+        bloqueadas = [
+            hora for hora in bloqueadas 
+            if not hora_liberada(fecha_str, hora)
+        ]
         libres = []
 
         fecha_str = fecha.strftime("%Y-%m-%d")
@@ -522,6 +545,17 @@ def whatsapp_webhook():
     except Exception as e:
         print("Error webhook WhatsApp:", e)
         return "OK", 200
+    
+conexion = sqlite3.connect("citas.db")
+cursor = conexion.cursor()
+
+cursor.execute("""
+INSERT INTO liberaciones (fecha, hora)
+VALUES (?, ?)
+""", ("2026-04-07", "17:00"))
+
+conexion.commit()
+conexion.close()
 
 if __name__ == "__main__":
     import os
