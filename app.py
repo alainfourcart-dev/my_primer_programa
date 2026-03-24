@@ -8,6 +8,37 @@ import sqlite3
 ADMIN_PASSWORD = "1234"
 SECRET_KEY = "mi_clave_secreta_123"
 
+def init_db():
+    conn = sqlite3.connect("agenda.db")
+    c = conn.cursor()
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS cierres (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fecha_inicio TEXT,
+        fecha_fin TEXT,
+        motivo TEXT
+    )
+    """)
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS bloqueos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fecha TEXT,
+        hora TEXT  
+    )
+    """)
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS liberadas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fecha TEXT,
+        hora TEXT  
+    )
+    """)
+    conn.commit()
+    conn.close()
+
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_FROM = "whatsapp:+14155238886"
@@ -478,7 +509,7 @@ def admin_cierre():
     motivo = request.form.get("motivo", "")
 
     if fecha_inicio and fecha_fin:
-        conexion = sqlite3.connect("citas.db")
+        conexion = sqlite3.connect("agenda.db")
         cursor = conexion.cursor()
         cursor.execute("""
             INSERT INTO cierres (fecha_inicio, fecha_fin, motivo)
@@ -487,6 +518,8 @@ def admin_cierre():
         conexion.commit()
         conexion.close()
     return redirect("/admin")
+
+
 
 @app.route("/admin/liberar", methods=["POST"])
 def admin_liberar():
@@ -497,7 +530,7 @@ def admin_liberar():
     hora = request.form.get("hora")
 
     if fecha and hora:
-        conexion = sqlite3.connect("citas.db")
+        conexion = sqlite3.connect("agenda.db")
         cursor = conexion.cursor()
         cursor.execute("""
             INSERT INTO liberaciones (fecha, hora)
@@ -516,7 +549,7 @@ def admin_bloquear():
     hora = request.form.get("hora")
 
     if fecha and hora:
-        conexion = sqlite3.connect("citas.db")
+        conexion = sqlite3.connect("agenda.db")
         cursor = conexion.cursor()
         cursor.execute("""
             INSERT INTO bloqueos_especiales (fecha, hora)
@@ -649,4 +682,5 @@ conexion.close()
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
+    init_db()
     app.run(host="0.0.0.0", port=port)
