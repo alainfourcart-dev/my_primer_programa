@@ -71,6 +71,39 @@
         .hora-btn-hover{
             opacity: 0.9;
         }
+        .header {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+        .chat-input button {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            background: #111827;
+            color: white;
+            cursor: pointer;
+        }
 
         @media (max-width: 700px) {
             body {
@@ -101,12 +134,17 @@
 <body>
 
 <div class="chat">
+<div class="header">
+    <h1>💈 Rocha Peluqueros</h1>
+    {% for mensaje in bienvenida %}
+        <p>{{ mensaje }}</p>
+    {% endfor %}
 
-<h3>💈 Rocha Peluqueros</h3>
-
-{% for mensaje in bienvenida %}
-<div class="bot">{{ mensaje }}</div>
-{% endfor %}
+    <div class="chat-input">
+        <input type="text" placeholder="Escribe tu mensaje...">
+        <button>Enviar</button>
+    </div>
+</div>
 
 {% if pregunta %}
 <div class="user">{{ pregunta }}</div>
