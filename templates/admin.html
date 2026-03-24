@@ -181,24 +181,32 @@
             color: white;
             border: none;
             border-radius: 14px;
-            padding: 18px;
-            font-size: 18px;
+            padding: 14px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
         }
         .boton-accion:hover {
             opacity: 0.92;
         }
+        .boton-accion.activo {
+            background: #2563eb;
+        }
         .panel-formulario {
             display: none;
+            opacity: 0;
             background: #fff;
             border: 1px solid #e5e5e5;
             border-radius: 16px;
             padding: 18px;
             margin-bottom: 18px;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
         }
         .panel-formulario.activo {
             display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
         .panel-formulario h3 {
             margin-top: 0;
@@ -259,16 +267,15 @@
     </style>
 </head>
 <script>
-function mostrarPanel(idPanel) {
+function mostrarPanel(idPanel, boton) {
     const paneles = document.querySelectorAll('.panel-formulario');
+    const botones = document.querySelectorAll('.boton-accion');
 
-    paneles.forEach(panel => {
-        if (panel.id === idPanel) {
-            panel.classList.toggle('activo');
-        } else {
-            panel.classList.remove('activo');
-        }
-    });
+    paneles.forEach(panel => panel.classList.remove ('activo'));
+    botones.forEach(btn => btn.classList.remove ('activo'));
+
+    document.getElementById(idPanel).classList.add('activo');
+    boton.classList.add('activo');
 }
 </script>
 <body>
@@ -280,15 +287,15 @@ function mostrarPanel(idPanel) {
             <h2>Gestión de calendario</h2>
 
             <div class="acciones-calendario">
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-cierre')">
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-cierre', this)">
                     Cerrar fechas
                 </button>
                 
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-liberar')">
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-liberar', this)">
                     Liberar cita fija
                 </button>
 
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-bloquear')">
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-bloquear', this)">
                     Bloquear hora especial
                 </button>
             </div>
