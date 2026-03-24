@@ -279,6 +279,8 @@ def esta_cerrado (dia, cierres):
         return False
 
 def obtener_disponibilidad():
+    inicializar_db()
+    
     citas_ocupadas = cargar_citas()
     disponibilidad = {}
 
