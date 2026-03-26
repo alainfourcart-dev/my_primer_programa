@@ -521,7 +521,7 @@ def admin():
         bloqueos=bloqueos
     )
 
-@app.route("/admin/añadir_cita" methods=["POST"])
+@app.route("/admin/añadir_cita", methods=["POST"])
 def admin_anadir_cita():
     if not session.get("admin"):
         return redirect("/login")
