@@ -405,7 +405,10 @@ function mostrarPanel(idPanel, boton) {
     <h2>Bloqueos especiales</h2>
     <ul>
     {% for b in bloqueos %}
-        <li>{{ b[1] }} - {{ b[2] }}</li>
+        <li>
+            {{ b[1] }} - {{ b[2] }}
+        <a href="/admin/eliminar_bloqueo/{{ b[0] }}">❌</a>
+        </li>
     {% endfor %}
     </ul>
 
