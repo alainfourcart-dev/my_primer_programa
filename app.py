@@ -536,6 +536,32 @@ def admin_cierre():
         conexion.close()
     return redirect("/admin")
 
+@app.route("/admin/eliminar_liberacion/<int:id>")
+def eliminar_liberacion(id):
+    if not session.get("admin"):
+        return redirect("/login")
+    
+    conn = sqlite3.connect("citas.db")
+    c = conn.cursor()
+    c.execute("DELETE FROM liberaciones WHERE id =?", (id,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
+@app.route("/admin/eliminar_cierre/<int:id>")
+def eliminar_cierre(id):
+    if not session.get("admin"):
+        return redirect("/login")
+    
+    conn = sqlite3.connect("citas.db")
+    c = conn.cursor()
+    c.execute("DELETE FROM cierres WHERE id =?", (id,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
 @app.route("/admin/eliminar_bloqueo/<int:id>")
 def eliminar_bloqueo(id):
     if not session.get("admin"):

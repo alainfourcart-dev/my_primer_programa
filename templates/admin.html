@@ -391,14 +391,20 @@ function mostrarPanel(idPanel, boton) {
     <h2>Cierres</h2>
     <ul>
     {% for c in cierres %}
-        <li>{{ c[1] }} -> {{ c[2] }} ({{ c[3] or "Sin motivo"}})</li>
+        <li>
+            {{ c[1] }} -> {{ c[2] }} ({{ c[3] or "Sin motivo"}})
+        <a href="/admin/eliminar_cierre/{{ c[0] }}">❌</a>
+        </li>
     {% endfor %}
     </ul>
 
     <h2>Liberaciones</h2>
     <ul>
     {% for l in liberaciones %}
-        <li>{{ l[1] }} - {{ l[2] }}</li>
+        <li>
+            {{ l[1] }} - {{ l[2] }}
+        <a href="/admin/eliminar_liberacion/{{ l[0] }}">❌</a>
+        </li>
     {% endfor %}
     </ul>
 
