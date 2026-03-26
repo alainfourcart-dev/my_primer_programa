@@ -232,6 +232,28 @@
             color: white;
             cursor: pointer;
         }
+        .form-admin {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .form-admin input {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .form-admin button {
+            font-weight: bold;
+            background: #0d1730;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            cursor: pointer;
+
+        }
 
         @media (max-width: 900px) {
             .acciones-calendario {
@@ -298,6 +320,10 @@ function mostrarPanel(idPanel, boton) {
                 <button type="button" class="boton-accion" onclick="mostrarPanel('panel-bloquear', this)">
                     Bloquear hora especial
                 </button>
+
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-bloquear', this)">
+                    Añadir cita manual
+                </button>
             </div>
 
             <div id="panel-cierre" class="panel-formulario">
@@ -326,6 +352,17 @@ function mostrarPanel(idPanel, boton) {
                     <input type="date" name="fecha" required>
                     <input type="time" name="hora" required>
                     <button type="submit">Bloquear hora</button>
+                </form>
+            </div>
+
+            <div id="panel-manual" class="panel-oculto">
+                <form method="POST" action="/admin/anadir_cita" class="form-admin">
+
+                    <input type="text" name="nombre" placeholder="Nombre" required>
+                    <input type="text" name="telefono" placeholder="Teléfono" required>
+                    <input type="date" name="fecha" required>
+                    <input type="time" name="hora" required>
+                    <button type="submit">Guardar cita</button>
                 </form>
             </div>
         </div>

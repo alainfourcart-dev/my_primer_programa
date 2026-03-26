@@ -521,6 +521,29 @@ def admin():
         bloqueos=bloqueos
     )
 
+@app.route("/admin/añadir_cita" methods=["POST"])
+def admin_anadir_cita():
+    if not session.get("admin"):
+        return redirect("/login")
+
+    nombre = request.form["nombre"]
+    telefono = request.form["telefono"]
+    fecha = request.form["fecha"]
+    hora = request.form["hora"]
+
+    conn = sqlite3.connect("citas.db")
+    c = conn.cursor()
+
+    c.execute("""
+        INSERT INTO citas (nombre, telefono, fecha, hora, estado
+        VALUES (?, ?, ?, ?, 'confirmada')
+    """, (nombre, telefono, fecha, hora))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/admin")
+
 @app.route("/admin/cierre", methods=["POST"])
 def admin_cierre():
     if not session.get("admin"):
