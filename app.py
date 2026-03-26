@@ -293,7 +293,7 @@ def obtener_disponibilidad():
 
     horas_manana = generar_horas ("10:00", "14:00", 40)
     horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
-    horas_extra = ["9:00", "9:30", "21:00", "21:30"]
+    horas_extra = ["09:00", "09:30", "21:00", "21:30"]
 
     hoy = date.today()
 
