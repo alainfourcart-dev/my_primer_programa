@@ -104,6 +104,15 @@
             color: white;
             cursor: pointer;
         }
+        .hora-extra {
+            border: 2px solid #c98a00;
+        }
+        .aviso-extra {
+            font-size: 14px;
+            margin: 10px 0 14px 0;
+            color: #8a5a00;
+            font-weight: 600;
+        }
 
         @media (max-width: 700px) {
             body {
@@ -171,13 +180,15 @@
             <input type="text" name="telefono" placeholder="Tu telefono" required>
         </div>
 
+        <p class="aviso-extra">Las citas fuera de horario habitual pueden tener un coste adicional.</p>
+
         <div class="bloque-horas">
             <h4>Mañana</h4>
             <div class="fila-horas">
-                {% for hora in info.horas %}
-                    {% if hora < "14:00" %}
-                        <button type="submit" name="hora" value="{{ hora }}" class="hora-btn">
-                            {{ hora }}
+                {% for h in info.horas %}
+                    {% if h.hora < "14:00" %}
+                        <button type="submit" name="hora" value="{{ h.hora }}" class="hora-btn {% if h.extra %}hora-extra{% endif %}">
+                            {{ h.hora }}{% if h.extra %} (+ coste extra){% endif %}
                         </button>
                     {% endif %}
                 {% endfor %}
@@ -187,10 +198,10 @@
         <div class="bloque-horas">
             <h4>Tarde</h4>
             <div class="fila-horas">
-                {% for hora in info.horas %}
-                    {% if hora >= "14:00" %}
-                        <button type="submit" name="hora" value="{{ hora }}" class="hora-btn">
-                            {{ hora }}
+                {% for h in info.horas %}
+                    {% if h.hora >= "14:00" %}
+                        <button type="submit" name="hora" value="{{ h.hora }}" class="hora-btn {% if h.extra %}hora-extra{% endif %}">
+                            {{ h.hora }}{% if h.extra %} (+ coste extra){% endif %}
                         </button>
                     {% endif %}
                 {% endfor %}

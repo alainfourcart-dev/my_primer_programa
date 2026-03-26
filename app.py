@@ -293,6 +293,7 @@ def obtener_disponibilidad():
 
     horas_manana = generar_horas ("10:00", "14:00", 40)
     horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
+    horas_extra = ["9:00", "9:30", "21:00", "21:30"]
 
     hoy = date.today()
 
@@ -308,9 +309,9 @@ def obtener_disponibilidad():
             continue
 
         if nombre_dia == "Sábado":
-            todas = horas_manana
+            todas = horas_manana + horas_extra
         else:
-            todas = horas_manana + horas_tarde
+            todas = horas_manana + horas_tarde + horas_extra
 
         bloqueadas = BLOQUEOS_FIJOS.get(nombre_dia, [])
         bloqueadas = [
@@ -329,7 +330,11 @@ def obtener_disponibilidad():
                 (clave not in citas_ocupadas and hora not in bloqueadas and not bloqueado_db)
                 or liberado_db
             ):
-                libres.append(hora)
+                es_extra = hora in horas_extra
+                libres.append({
+                    "hora": hora,
+                    "extra": es_extra
+                })
 
         disponibilidad[etiqueta] = {
             "fecha": fecha_str,
