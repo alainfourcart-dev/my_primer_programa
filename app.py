@@ -247,6 +247,30 @@ def esta_cerrado (dia, cierres):
             return True
         return False
 
+def obtener_cierres():
+    conn = sqlite3.connect("citas.db")
+    c = conn.cursor()
+    c.execute("SELECT id, fecha_inicio, fecha_fin, motivo FROM cierres")
+    datos = c.fetchall()
+    conn.close()
+    return datos
+
+def obtener_liberaciones():
+    conn = sqlite3.connect("citas.db")
+    c = conn.cursor()
+    c.execute("SELECT id, fecha, hora FROM liberaciones")
+    datos = c.fetchall()
+    conn.close()
+    return datos
+
+def obtener_bloqueos_especiales():
+    conn = sqlite3.connect("citas.db")
+    c = conn.cursor()
+    c.execute("SELECT id, fecha, hora FROM bloqueos_especiales")
+    datos = c.fetchall()
+    conn.close()
+    return datos
+
 def obtener_disponibilidad():
     inicializar_db()
 
@@ -479,11 +503,17 @@ def admin():
 
     pendientes_agrupadas = agrupar_por_dia(pendientes)
     confirmadas_agrupadas = agrupar_por_dia(confirmadas)
+    cierres = obtener_cierres()
+    liberaciones = obtener_liberaciones()
+    bloqueos = obtener_bloqueos_especiales()
 
     return render_template(
         "admin.html",
         pendientes_agrupadas=pendientes_agrupadas,
-        confirmadas_agrupadas=confirmadas_agrupadas
+        confirmadas_agrupadas=confirmadas_agrupadas,
+        cierres=cierres,
+        liberaciones=liberaciones,
+        bloqueos=bloqueos
     )
 
 @app.route("/admin/cierre", methods=["POST"])
