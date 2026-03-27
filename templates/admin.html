@@ -346,6 +346,15 @@ function mostrarSeccion(idPanel, boton) {
                     <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-confirmadas', this)">
                         Confirmadas
                     </button>
+                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-cierres', this)">
+                        Cierres
+                    </button>
+                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-liberaciones', this)">
+                        Liberaciones
+                    </button>
+                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-bloqueos', this)">
+                        Bloqueos
+                    </button>
                 </div>
 
                 <div id="panel-pendientes" class="panel-lista">
@@ -410,35 +419,47 @@ function mostrarSeccion(idPanel, boton) {
             </div>
         </div>
         <hr>
-        <h2>Cierres</h2>
-        <ul>
-            {% for c in cierres %}
-                <li>
-                    {{ c[1] }} -> {{ c[2] }} ({{ c[3] or "Sin motivo"}})
-                    <a href="/admin/eliminar_cierre/{{ c[0] }}" class="btn-x">❌</a>
-                </li>
-            {% endfor %}
-        </ul>
+        <div id="panel-cierres" class="panel-lista">
+            <div class="seccion">
+                <h2>Cierres</h2>
+                <ul>
+                    {% for c in cierres %}
+                        <li>
+                            {{ c[1] }} -> {{ c[2] }} ({{ c[3] or "Sin motivo"}})
+                            <a href="/admin/eliminar_cierre/{{ c[0] }}" class="btn-x">❌</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
-        <h2>Liberaciones</h2>
-        <ul>
-        {% for l in liberaciones %}
-            <li>
-                {{ l[1] }} - {{ l[2] }}
-                <a href="/admin/eliminar_liberacion/{{ l[0] }}" class="btn-x">❌</a>
-            </li>
-        {% endfor %}
-        </ul>
+        <div id="panel-liberaciones" class="panel-lista">
+            <div class="seccion">
+                <h2>Liberaciones</h2>
+                <ul>
+                    {% for l in liberaciones %}
+                    <li>
+                        {{ l[1] }} - {{ l[2] }}
+                        <a href="/admin/eliminar_liberacion/{{ l[0] }}" class="btn-x">❌</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
 
-        <h2>Bloqueos especiales</h2>
-        <ul>
-            {% for b in bloqueos %}
-            <li>
-                {{ b[1] }} - {{ b[2] }}
-                <a href="/admin/eliminar_bloqueo/{{ b[0] }}" class="btn-x">❌</a>
-            </li>
-        {% endfor %}
-        </ul>
+        <div id="panel-bloqueos" class="panel-lista">
+            <div class="seccion">
+                <h2>Bloqueos especiales</h2>
+                <ul>
+                    {% for b in bloqueos %}
+                        <li>
+                            {{ b[1] }} - {{ b[2] }}
+                            <a href="/admin/eliminar_bloqueo/{{ b[0] }}" class="btn-x">❌</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 </body>
 </html>
