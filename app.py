@@ -535,9 +535,9 @@ def admin_anadir_cita():
     c = conn.cursor()
 
     c.execute("""
-        INSERT INTO citas (nombre, telefono, fecha, hora, estado)
+        INSERT INTO citas (dia, hora, nombre, telefono, estado)
         VALUES (?, ?, ?, ?, 'confirmada')
-    """, (nombre, telefono, fecha, hora))
+    """, (fecha, hora, nombre, telefono))
 
     conn.commit()
     conn.close()
