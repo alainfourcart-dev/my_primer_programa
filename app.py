@@ -526,7 +526,7 @@ def admin():
         confirmadas_agrupadas=confirmadas_agrupadas,
         cierres=cierres,
         liberaciones=liberaciones,
-        bloqueos=bloqueos
+        bloqueos=bloqueos,
         extras_activadas=extras_activadas
     )
 
