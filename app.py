@@ -521,7 +521,7 @@ def admin():
         bloqueos=bloqueos
     )
 
-@app.route("/admin/añadir_cita", methods=["POST"])
+@app.route("/admin/anadir_cita", methods=["POST"])
 def admin_anadir_cita():
     if not session.get("admin"):
         return redirect("/login")
@@ -535,7 +535,7 @@ def admin_anadir_cita():
     c = conn.cursor()
 
     c.execute("""
-        INSERT INTO citas (nombre, telefono, fecha, hora, estado
+        INSERT INTO citas (nombre, telefono, fecha, hora, estado)
         VALUES (?, ?, ?, ?, 'confirmada')
     """, (nombre, telefono, fecha, hora))
 
