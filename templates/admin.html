@@ -118,15 +118,15 @@
         }
         .btn-ok {
             color: white;
-            border-radius: 8px;
-            padding: 8px 10px;
+            border-radius: 5px;
+            padding: 5px 10px;
             text-decoration: none;
         }
         .btn-x {
             color: white;
             text-decoration: none;
-            padding: 8px 10px;
-            border-radius: 8px;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
         .acciones-calendario {
             display: grid;
@@ -173,6 +173,7 @@
             border: 1px solid #e5e5e5;
             border-radius: 16px;
             padding: 18px;
+            margin-top: 16px;
             margin-bottom: 18px;
             transform: translateY(-10px);
             transition: all 0.2s ease;
@@ -335,76 +336,79 @@ function mostrarSeccion(idPanel, boton) {
                 </form>
             </div>
 
-            <div class="acciones-listas">
-                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-pendientes', this)">
-                    Pendientes
-                </button>
-                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-confirmadas', this)">
-                    Confirmadas
-                </button>
-            </div>
+            <div class="seccion">
+                <h2>Citas</h2>
 
-            <div id="panel-pendientes" class="panel-lista">
-                <div class="seccion">
-                    <h2>Pendientes</h2>
-
-                    {% if pendientes_agrupadas %}
-                        {% for dia in pendientes_agrupadas %}
-                            {% set citas_dia = pendientes_agrupadas[dia] %}
-                            <div class="dia">
-                                <h3>{{ dia }}</h3>
-
-                                {% for cita in citas_dia %}
-                                    <div class="cita pendiente">
-                                        <div>
-                                            <span class="hora">{{ cita["hora"] }}</span>
-                                            <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
-                                        </div>
-                
-                                        <div class="botones">
-                                            <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-ok">✅</a>
-                                            <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="vacio">No hay citas pendientes.</p>
-                    {% endif %}
+                <div class="acciones-listas">
+                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-pendientes', this)">
+                        Pendientes
+                    </button>
+                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-confirmadas', this)">
+                        Confirmadas
+                    </button>
                 </div>
-            </div>
-            <div id="panel-confirmadas" class="panel-lista">
-                <div class="seccion">
-                    <h2>Confirmadas</h2>
 
-                    {% if confirmadas_agrupadas %}
-                        {% for dia in confirmadas_agrupadas %}
-                            {% set citas_dia = confirmadas_agrupadas[dia] %}
-                            <div class="dia">
-                                <h3>{{ dia }}</h3>
+                <div id="panel-pendientes" class="panel-lista">
+                    <div class="seccion">
+                        <h2>Pendientes</h2>
 
-                                {% for cita in citas_dia %}
-                                    <div class="cita confirmada">
-                                        <div>
-                                            <span class="hora">{{ cita["hora"] }}</span>
-                                            <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
-                                        </div>
+                        {% if pendientes_agrupadas %}
+                            {% for dia in pendientes_agrupadas %}
+                                {% set citas_dia = pendientes_agrupadas[dia] %}
+                                <div class="dia">
+                                    <h3>{{ dia }}</h3>
+
+                                    {% for cita in citas_dia %}
+                                        <div class="cita pendiente">
+                                            <div>
+                                                <span class="hora">{{ cita["hora"] }}</span>
+                                                <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                            </div>
                 
-                                        <div class="botones">
-                                            <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                            <div class="botones">
+                                                <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-ok">✅</a>
+                                                <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                            </div>
                                         </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="vacio">No hay citas confirmadas.</p>
-                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="vacio">No hay citas pendientes.</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>     
+                <div id="panel-confirmadas" class="panel-lista">
+                    <div class="seccion">
+                        <h2>Confirmadas</h2>
+
+                        {% if confirmadas_agrupadas %}
+                            {% for dia in confirmadas_agrupadas %}
+                                {% set citas_dia = confirmadas_agrupadas[dia] %}
+                                <div class="dia">
+                                    <h3>{{ dia }}</h3>
+
+                                    {% for cita in citas_dia %}
+                                        <div class="cita confirmada">
+                                            <div>
+                                                <span class="hora">{{ cita["hora"] }}</span>
+                                                <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                            </div>
+                
+                                            <div class="botones">
+                                                <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="vacio">No hay citas confirmadas.</p>
+                        {% endif %}
+                    </div>
+                </div>     
+            </div>
         </div>
-
         <hr>
         <h2>Cierres</h2>
         <ul>
