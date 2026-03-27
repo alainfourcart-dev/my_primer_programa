@@ -190,7 +190,8 @@
             opacity: 0.92;
         }
         .boton-accion.activo {
-            background: #2563eb;
+            background: #c98a00;
+            color: white;
         }
         .panel-formulario {
             display: none;
@@ -231,6 +232,12 @@
             background: #111827;
             color: white;
             cursor: pointer;
+        }
+        .panel-oculto {
+            display: none;
+        }
+        .panel-visible {
+            display: block;
         }
         .form-admin {
             display: flex;
@@ -295,7 +302,8 @@ function mostrarPanel(idPanel, boton) {
     paneles.forEach(panel => panel.classList.remove ('activo'));
     botones.forEach(btn => btn.classList.remove ('activo'));
 
-    document.getElementById(idPanel).classList.add('activo');
+    const panel = document.getElementById(idPanel);
+    panel.classList.add('activo');
     boton.classList.add('activo');
 }
 </script>
@@ -320,12 +328,12 @@ function mostrarPanel(idPanel, boton) {
                     Bloquear hora especial
                 </button>
 
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-bloquear', this)">
+                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-manual', this)">
                     Añadir cita manual
                 </button>
             </div>
 
-            <div id="panel-cierre" class="panel-formulario">
+            <div id="panel-cierre" class="panel-formulario panel-oculto">
                 <h3>Cerrar fechas</h3>
                 <form action="/admin/cierre" method="POST">
                     <input type="date" name="fecha_inicio" required>
@@ -335,7 +343,7 @@ function mostrarPanel(idPanel, boton) {
                 </form>
             </div>
 
-            <div id="panel-liberar" class="panel-formulario">
+            <div id="panel-liberar" class="panel-formulario panel-oculto">
                 <h3>Liberar cita fija</h3>
                 <form action="/admin/liberar" method="POST">
                     <input type="date" name="fecha" required>
@@ -344,7 +352,7 @@ function mostrarPanel(idPanel, boton) {
                 </form>
             </div>
 
-            <div id="panel-bloquear" class="panel-formulario">
+            <div id="panel-bloquear" class="panel-formulario panel-oculto">
                 <h3>Bloquear hora especial</h3>
                 <form action="/admin/bloquear" method="POST">
                     <h3>Bloquear hora especial</h3>
@@ -354,7 +362,7 @@ function mostrarPanel(idPanel, boton) {
                 </form>
             </div>
 
-            <div id="panel-manual" class="panel-oculto">
+            <div id="panel-manual" class="panel-formulario panel-oculto">
                 <form method="POST" action="/admin/anadir_cita" class="form-admin">
                     <input type="text" name="nombre" placeholder="Nombre" required>
                     <input type="text" name="telefono" placeholder="Teléfono" required>
