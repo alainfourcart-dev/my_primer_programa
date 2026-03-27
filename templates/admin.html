@@ -193,6 +193,18 @@
             background: #c98a00;
             color: white;
         }
+        .boton-accion-secundario.activo {
+            background: #0d1730;
+            color: white;
+        }
+        .boton-accion-secundario {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid #d0d0d0;
+            background: #f7f7f7;
+            cursor: pointer;
+            font-weight: 600;
+        }
         .panel-formulario {
             display: none;
             opacity: 0;
@@ -238,6 +250,22 @@
         }
         .panel-visible {
             display: block;
+        }
+        .panel-lista {
+            display: none;
+            opacity: 0;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        .panel-lista.activo {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
         .form-admin {
             display: flex;
@@ -297,13 +325,22 @@
 <script>
 function mostrarSeccion(idPanel, boton) {
     const paneles = document.querySelectorAll('.panel-formulario, .panel-lista');
-    paneles.forEach(panel => panel.classList.remove ('activo'));
-
     const botones = document.querySelectorAll('.boton-accion, .boton-accion-secundario');
-    botones.forEach(btn => btn.classList.remove ('activo'));
 
-    document.getElementById(idPanel).classList.add('activo');
-    boton.classList.add('activo');
+    paneles.forEach(panel => {
+        panel.classList.remove ('activo')
+    });
+    botones.forEach(btn => {
+        btn.classList.remove ('activo')
+    });
+
+    const panel = document.getElementById(idPanel);
+    if (panel) {
+        panel.classList.add('activo');
+    }
+    if (boton) {
+        boton.classList.add('activo');
+    } 
 }
 </script>
 <body>
@@ -315,24 +352,24 @@ function mostrarSeccion(idPanel, boton) {
             <h2>Gestión de calendario</h2>
 
             <div class="acciones-calendario">
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-cierre', this)">
+                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-cierre', this)">
                     Cerrar fechas
                 </button>
                 
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-liberar', this)">
+                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-liberar', this)">
                     Liberar cita fija
                 </button>
 
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-bloquear', this)">
+                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-bloquear', this)">
                     Bloquear hora especial
                 </button>
 
-                <button type="button" class="boton-accion" onclick="mostrarPanel('panel-manual', this)">
+                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-manual', this)">
                     Añadir cita manual
                 </button>
             </div>
 
-            <div id="panel-cierre" class="panel-formulario panel-oculto">
+            <div id="panel-cierre" class="panel-formulario">
                 <h3>Cerrar fechas</h3>
                 <form action="/admin/cierre" method="POST">
                     <input type="date" name="fecha_inicio" required>
@@ -342,7 +379,7 @@ function mostrarSeccion(idPanel, boton) {
                 </form>
             </div>
 
-            <div id="panel-liberar" class="panel-formulario panel-oculto">
+            <div id="panel-liberar" class="panel-formulario">
                 <h3>Liberar cita fija</h3>
                 <form action="/admin/liberar" method="POST">
                     <input type="date" name="fecha" required>
@@ -351,7 +388,7 @@ function mostrarSeccion(idPanel, boton) {
                 </form>
             </div>
 
-            <div id="panel-bloquear" class="panel-formulario panel-oculto">
+            <div id="panel-bloquear" class="panel-formulario">
                 <h3>Bloquear hora especial</h3>
                 <form action="/admin/bloquear" method="POST">
                     <h3>Bloquear hora especial</h3>
@@ -361,7 +398,7 @@ function mostrarSeccion(idPanel, boton) {
                 </form>
             </div>
 
-            <div id="panel-manual" class="panel-formulario panel-oculto">
+            <div id="panel-manual" class="panel-formulario">
                 <form method="POST" action="/admin/anadir_cita" class="form-admin">
                     <input type="text" name="nombre" placeholder="Nombre" required>
                     <input type="text" name="telefono" placeholder="Teléfono" required>
@@ -383,7 +420,7 @@ function mostrarSeccion(idPanel, boton) {
             </button>
         </div>
 
-        <div id="panel-pendientes" class="panel-lista panel-oculto">
+        <div id="panel-pendientes" class="panel-lista">
             <div class="seccion">
                 <h2>Pendientes</h2>
 
@@ -413,7 +450,7 @@ function mostrarSeccion(idPanel, boton) {
                 {% endif %}
             </div>
         </div>
-        <div id="panel-confirmadas" class="panel-lista panel-oculto">
+        <div id="panel-confirmadas" class="panel-lista">
             <div class="seccion">
                 <h2>Confirmadas</h2>
 
