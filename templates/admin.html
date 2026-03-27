@@ -295,15 +295,14 @@
     </style>
 </head>
 <script>
-function mostrarPanel(idPanel, boton) {
-    const paneles = document.querySelectorAll('.panel-formulario');
-    const botones = document.querySelectorAll('.boton-accion');
-
+function mostrarSeccion(idPanel, boton) {
+    const paneles = document.querySelectorAll('.panel-formulario, .panel-lista');
     paneles.forEach(panel => panel.classList.remove ('activo'));
+
+    const botones = document.querySelectorAll('.boton-accion, .boton-accion-secundario');
     botones.forEach(btn => btn.classList.remove ('activo'));
 
-    const panel = document.getElementById(idPanel);
-    panel.classList.add('activo');
+    document.getElementById(idPanel).classList.add('activo');
     boton.classList.add('activo');
 }
 </script>
@@ -373,61 +372,77 @@ function mostrarPanel(idPanel, boton) {
             </div>
         </div>
 
-        <div class="seccion">
-            <h2>Pendientes</h2>
+        <div class="acciones-listas">
+            <button type="button" class="boton-accion-secundario"
+            onclick="mostrarSeccion('panel-pendientes', this)">
+                Pendientes
+            </button>
+            <button type="button" class="boton-accion-secundario"
+            onclick="mostrarSeccion('panel-confirmadas', this)">
+                Confirmadas
+            </button>
+        </div>
 
-            {% if pendientes_agrupadas %}
-                {% for dia in pendientes_agrupadas %}
-                    {% set citas_dia = pendientes_agrupadas[dia] %}
-                    </div class="dia">
-                        <h3>{{ dia }}</h3>
+        <div id="panel-pendientes" class="panel-lista panel-oculto">
+            <div class="seccion">
+                <h2>Pendientes</h2>
 
-                        {% for cita in citas_dia %}
-                            <div class="cita pendiente">
-                                <div>
-                                    <span class="hora">{{ cita["hora"] }}</span>
-                                    <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
-                                </div>
+                {% if pendientes_agrupadas %}
+                    {% for dia in pendientes_agrupadas %}
+                        {% set citas_dia = pendientes_agrupadas[dia] %}
+                        </div class="dia">
+                            <h3>{{ dia }}</h3>
+
+                            {% for cita in citas_dia %}
+                                <div class="cita pendiente">
+                                    <div>
+                                        <span class="hora">{{ cita["hora"] }}</span>
+                                        <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                    </div>
                 
-                                <div class="botones">
-                                    <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}">✅</a>
-                                    <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}">❌</a>
+                                    <div class="botones">
+                                        <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}">✅</a>
+                                        <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}">❌</a>
+                                    </div>
                                 </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No hay citas pendientes.</p>
-            {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay citas pendientes.</p>
+                {% endif %}
+            </div>
         </div>
-        <div class="seccion">
-            <h2>Confirmadas</h2>
-            
-            {% if confirmadas_agrupadas %}
-                {% for dia in confirmadas_agrupadas %}
-                    {% set citas_dia = confirmadas_agrupadas[dia] %}
-                    <div class="dia">
-                        <h3>{{ dia }}</h3>
+        <div id="panel-confirmadas" class="panel-lista panel-oculto">
+            <div class="seccion">
+                <h2>Confirmadas</h2>
 
-                        {% for cita in citas_dia %}
-                            <div class="cita confirmada">
-                                <div>
-                                    <span class="hora">{{ cita["hora"] }}</span>
-                                    <strong>{{ cita["nombre"] }}</strong> · {{ cita["telefono"] }}
-                                </div>
+                {% if confirmadas_agrupadas %}
+                    {% for dia in confirmadas_agrupadas %}
+                        {% set citas_dia = confirmadas_agrupadas[dia] %}
+                        </div class="dia">
+                            <h3>{{ dia }}</h3>
 
-                                <div class="botones">
-                                    <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}">❌</a>
+                            {% for cita in citas_dia %}
+                                <div class="cita confirmada">
+                                    <div>
+                                        <span class="hora">{{ cita["hora"] }}</span>
+                                        <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                    </div>
+                
+                                    <div class="botones">
+                                        <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}">❌</a>
+                                    </div>
                                 </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="vacio">No hay citas confirmadas.</p>
-            {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="vacio">No hay citas confirmadas.</p>
+                {% endif %}
+            </div>
         </div>
+                
     </div>
     <hr>
 
