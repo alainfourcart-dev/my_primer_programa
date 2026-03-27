@@ -297,6 +297,16 @@ function mostrarSeccion(idPanel, boton) {
                 </button>
             </div>
 
+            <form method="POST" action="/admin/toggle_extras">
+                <button type="submit" class="boton-accion">
+                    {% if extras_activadas %}
+                        Desactivar horas extras
+                    {% else %}
+                        Activar horas extras
+                    {% endif %}
+                </button>
+            </form>
+
             <div id="panel-cierre" class="panel-formulario">
                 <h3>Cerrar fechas</h3>
                 <form action="/admin/cierre" method="POST">

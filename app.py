@@ -8,6 +8,8 @@ import sqlite3
 ADMIN_PASSWORD = "1234"
 SECRET_KEY = "mi_clave_secreta_123"
 
+extras_activadas = False
+
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_FROM = "whatsapp:+14155238886"
@@ -272,6 +274,8 @@ def obtener_bloqueos_especiales():
     return datos
 
 def obtener_disponibilidad():
+    global extras_activadas
+
     inicializar_db()
 
     citas_ocupadas = cargar_citas()
@@ -293,7 +297,11 @@ def obtener_disponibilidad():
 
     horas_manana = generar_horas ("10:00", "14:00", 40)
     horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
-    horas_extra = ["09:00", "09:30", "21:00", "21:30"]
+    
+    if extras_activadas:
+        horas_extra = ["09:30", "16:00", "21:00"]
+    else:
+        horas_extra = []
 
     hoy = date.today()
 
@@ -519,6 +527,7 @@ def admin():
         cierres=cierres,
         liberaciones=liberaciones,
         bloqueos=bloqueos
+        extras_activadas=extras_activadas
     )
 
 @app.route("/admin/anadir_cita", methods=["POST"])
@@ -588,6 +597,16 @@ def eliminar_cierre(id):
     conn.commit()
     conn.close()
 
+    return redirect("/admin")
+
+@app.route("/admin/toggle_extras", methods=["POST"])
+def toggle_extras():
+    global extras_activadas
+
+    if not session.get("admin"):
+        return redirect("/login")
+
+    extras_activadas = not extras_activadas
     return redirect("/admin")
 
 @app.route("/admin/eliminar_bloqueo/<int:id>")
