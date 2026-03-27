@@ -72,6 +72,12 @@ def inicializar_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS extras_dias(
+            fecha TEXT PRIMARY KEY
+        )
+    """)
+
     conexion.commit()
     conexion.close()
 
@@ -100,6 +106,14 @@ def cargar_citas():
 
     citas = [f"{dia}|{hora}" for dia, hora in filas]
     return citas
+
+def obtener_dias_extras():
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+    cursor.execute("SELECT fecha FROM extras_dias")
+    datos = cursor.fetchall()
+    conexion.close()
+    return [fila[0] for fila in datos]
 
 def fecha_esta_cerrada(fecha_str):
     conexion = sqlite3.connect("citas.db")
@@ -297,13 +311,10 @@ def obtener_disponibilidad():
 
     horas_manana = generar_horas ("10:00", "14:00", 40)
     horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
-    
-    if extras_activadas:
-        horas_extra = ["09:30", "16:00", "21:00"]
-    else:
-        horas_extra = []
+    horas_extra = ["09:30", "16:00", "21:00"]
 
     hoy = date.today()
+    dias_extras = obtener_dias_extras()
 
     for i in range (30):
         fecha = hoy + timedelta(days=i)
@@ -317,9 +328,11 @@ def obtener_disponibilidad():
             continue
 
         if nombre_dia == "Sábado":
-            todas = horas_manana + horas_extra
+            todas = horas_manana.copy()
         else:
-            todas = horas_manana + horas_tarde + horas_extra
+            todas = horas_manana + horas_tarde
+        if fecha_str in dias_extras:
+            todas += horas_extra
 
         bloqueadas = BLOQUEOS_FIJOS.get(nombre_dia, [])
         bloqueadas = [
@@ -599,14 +612,28 @@ def eliminar_cierre(id):
 
     return redirect("/admin")
 
-@app.route("/admin/toggle_extras", methods=["POST"])
-def toggle_extras():
-    global extras_activadas
+@app.route("/admin/extra_dia", methods=["POST"])
+def activar_extra_dia():
+    fecha = request.form["fecha"]
 
-    if not session.get("admin"):
-        return redirect("/login")
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+    cursor.execute("INSERT OR IGNORE INTO extras_dias (fecha) VALUES (?)", (fecha))
+    conexion.commit()
+    conexion.close()
 
-    extras_activadas = not extras_activadas
+    return redirect("/admin")
+
+@app.route("/admin/quitar_extra_dia", methods=["POST"])
+def quitar_extra_dia():
+    fecha = request.form["fecha"]
+
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM extras_dias WHERE fecha = ?", (fecha))
+    conexion.commit()
+    conexion.close()
+
     return redirect("/admin")
 
 @app.route("/admin/eliminar_bloqueo/<int:id>")
