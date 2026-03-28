@@ -191,12 +191,15 @@
             gap: 12px;
         }
         .form-admin input,
+        .form-admin select,
         .form-admin button {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
             font-size: 16px;
             box-sizing: border-box;
+            margin-bottom: 12px;
         }
         .form-admin input {
             border: 1px solid #ccc;
@@ -527,6 +530,7 @@ function mostrarSeccion(idPanel, boton) {
             {% endif %}
         </div>
     </div>
+
     <div id="panel-cliente-fijo" class="panel-formulario">
         <h3>Añadir cliente fijo</h3>
 
@@ -535,7 +539,7 @@ function mostrarSeccion(idPanel, boton) {
             <input type="text" name="telefono" placeholder="Teléfono" required>
 
             <select name="dia_semana" required>
-                <option value="">Selecciona día</option>
+                <option value="" disabled selected>Selecciona día</option>
                 <option value="Martes">Martes</option>
                 <option value="Miércoles">Miércoles</option>
                 <option value="Jueves">Jueves</option>

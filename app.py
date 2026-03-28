@@ -605,6 +605,9 @@ def anadir_cliente_fijo():
     dia_semana = request.form["dia_semana"]
     hora = request.form["hora"]
 
+    if not dia_semana:
+        return "Error: debes seleccionar un día"
+
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
     cursor.execute("""
