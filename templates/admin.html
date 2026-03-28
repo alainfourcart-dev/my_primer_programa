@@ -165,31 +165,20 @@
             cursor: pointer;
             font-weight: 600;
         }
-        .panel-formulario {
-            width: 100%;
-            max-width: 600px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #e5e5e5;
-        }
+        .panel-formulario,
         .panel-lista {
             display: none;
-            opacity: 0;
             background: #fff;
             border: 1px solid #e5e5e5;
             border-radius: 16px;
             padding: 18px;
             margin-top: 16px;
             margin-bottom: 18px;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
+            box-sizing: border-box;
         }
         .panel-formulario.activo,
         .panel-lista.activo {
-            display: block;
-            opacity: 1;
-            transform: translateY(0); 
+            display: block; 
         }
         .panel-formulario h3,
         .panel-lista h3 {
@@ -358,7 +347,7 @@ function mostrarSeccion(idPanel, boton) {
 
         <div id="panel-cierre" class="panel-formulario">
             <h3>Cerrar fechas</h3>
-            <form action="/admin/cierre" method="POST">
+            <form action="/admin/cierre" method="POST" class="form-admin">
                 <input type="date" name="fecha_inicio" required>
                 <input type="date" name="fecha_fin" required>
                 <input type="text" name="motivo" placeholder="Motivo (vacaciones, festivo...)" required>
@@ -368,7 +357,7 @@ function mostrarSeccion(idPanel, boton) {
 
         <div id="panel-liberar" class="panel-formulario">
             <h3>Liberar cita fija</h3>
-            <form action="/admin/liberar" method="POST">
+            <form action="/admin/liberar" method="POST" class="form-admin">
                 <input type="date" name="fecha" required>
                 <input type="time" name="hora" required>
                 <button type="submit">Liberar hora</button>
@@ -377,7 +366,7 @@ function mostrarSeccion(idPanel, boton) {
 
         <div id="panel-bloquear" class="panel-formulario">
             <h3>Bloquear hora especial</h3>
-            <form action="/admin/bloquear" method="POST">
+            <form action="/admin/bloquear" method="POST" class="form-admin">
                 <input type="date" name="fecha" required>
                 <input type="time" name="hora" required>
                 <button type="submit">Bloquear hora</button>
