@@ -614,11 +614,17 @@ def eliminar_cierre(id):
 
 @app.route("/admin/extra_dia", methods=["POST"])
 def activar_extra_dia():
+    if not session.get("admin"):
+        return redirect("/login")
+    
     fecha = request.form["fecha"]
 
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
-    cursor.execute("INSERT OR IGNORE INTO extras_dias (fecha) VALUES (?)", (fecha))
+    cursor.execute(
+        "INSERT OR IGNORE INTO extras_dias (fecha) VALUES (?)",
+        (fecha,)
+    )
     conexion.commit()
     conexion.close()
 
@@ -626,11 +632,17 @@ def activar_extra_dia():
 
 @app.route("/admin/quitar_extra_dia", methods=["POST"])
 def quitar_extra_dia():
+    if not session.get("admin"):
+        return redirect("/login")
+    
     fecha = request.form["fecha"]
 
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
-    cursor.execute("DELETE FROM extras_dias WHERE fecha = ?", (fecha))
+    cursor.execute(
+        "DELETE FROM extras_dias WHERE fecha = ?",
+        (fecha,)
+    )
     conexion.commit()
     conexion.close()
 
