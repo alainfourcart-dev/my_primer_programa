@@ -36,16 +36,6 @@ def inicializar_db():
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
-    try:
-        cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN dia_semana TEXT")
-    except:
-        pass
-
-    try:
-        cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN hora TEXT")
-    except:
-        pass
-
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS citas (
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -96,6 +86,16 @@ def inicializar_db():
             hora TEXT NOT NULL
         )
     """)
+
+    try:
+        cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN dia_semana TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN hora TEXT")
+    except:
+        pass
 
     conexion.commit()
     conexion.close()
@@ -309,7 +309,7 @@ def obtener_bloqueos_especiales():
 def obtener_clientes_fijos():
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
-    cursor.execute("SELECT id, nombre, telefono, dia_semana, hora FROM clientes_fijos")
+    cursor.execute("SELECT id, nombre, telefono, dias_semana, hora FROM clientes_fijos")
     datos = cursor.fetchall()
     conexion.close()
     return datos
@@ -602,18 +602,18 @@ def anadir_cliente_fijo():
 
     nombre = request.form["nombre"]
     telefono = request.form["telefono"]
-    dia_semana = request.form["dia_semana"]
+    dias_semana = request.form["dia_semana"]
     hora = request.form["hora"]
 
-    if not dia_semana:
+    if not dias_semana:
         return "Error: debes seleccionar un día"
 
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect("citas.db", timeout=10)
     cursor = conexion.cursor()
     cursor.execute("""
-        INSERT INTO clientes_fijos (nombre, telefono, dia_semana, hora)
+        INSERT INTO clientes_fijos (nombre, telefono, dias_semana, hora)
         VALUES (?, ?, ?, ?)
-    """, (nombre, telefono, dia_semana, hora))
+    """, (nombre, telefono, dias_semana, hora))
     conexion.commit()
     conexion.close()
 
