@@ -324,6 +324,9 @@ function mostrarSeccion(idPanel, boton) {
                 <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-bloqueos', this)">
                     Bloqueos
                 </button>
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-clientes-fijos', this)">
+                    Clientes fijos
+                </button>
             </div>
         </div>
             
@@ -498,6 +501,25 @@ function mostrarSeccion(idPanel, boton) {
                 </ul>
             {% else %}
                <p class="vacio">No hay bloqueos especiales.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="panel-clientes-fijos" class="panel-lista">
+        <div class="seccion">
+            <h2>Clientes fijos</h2>
+
+            {% if clientes_fijos %}
+                <ul>
+                    {% for c in clientes_fijos %}
+                        <li>
+                            <strong>{{ c[1] }}</strong> · {{ c[2] }} · {{ c[3] }} · {{ c[4] }}
+                            <a href="/admin/eliminar_cliente_fijo/{{ c[0] }}" class="btn-x">❌</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="vacio">No hay clientes fijos</p>
             {% endif %}
         </div>
     </div>

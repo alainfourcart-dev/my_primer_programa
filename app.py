@@ -77,6 +77,15 @@ def inicializar_db():
             fecha TEXT PRIMARY KEY
         )
     """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS clientes_fijos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            telefono TEXT NOT NULL,
+            dias_semana TEXT NOT NULL,
+            hora TEXT NOT NULL
+        )
+    """)
 
     conexion.commit()
     conexion.close()
@@ -285,6 +294,14 @@ def obtener_bloqueos_especiales():
     c.execute("SELECT id, fecha, hora FROM bloqueos_especiales")
     datos = c.fetchall()
     conn.close()
+    return datos
+
+def obtener_clientes_fijos():
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id, nombre, telefono, dia_semana, hora FROM clientes_fijos")
+    datos = cursor.fetchall()
+    conexion.close()
     return datos
 
 def obtener_disponibilidad():
@@ -532,6 +549,7 @@ def admin():
     cierres = obtener_cierres()
     liberaciones = obtener_liberaciones()
     bloqueos = obtener_bloqueos_especiales()
+    clientes_fijos = obtener_clientes_fijos()
 
     return render_template(
         "admin.html",
@@ -540,7 +558,8 @@ def admin():
         cierres=cierres,
         liberaciones=liberaciones,
         bloqueos=bloqueos,
-        extras_activadas=extras_activadas
+        extras_activadas=extras_activadas,
+        clientes_fijos=clientes_fijos
     )
 
 @app.route("/admin/anadir_cita", methods=["POST"])
@@ -563,6 +582,40 @@ def admin_anadir_cita():
 
     conn.commit()
     conn.close()
+
+    return redirect("/admin")
+
+@app.route("/admin/anadir_cliente_fijo", methods=["POST"])
+def anadir_cliente_fijo():
+    if not session.get("admin"):
+        return redirect("/login")
+
+    nombre = request.form["nombre"]
+    telefono = request.form["telefono"]
+    dia_semana = request.form["dia_semana"]
+    hora = request.form["hora"]
+
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+    cursor.execute("""
+        INSERT INTO clientes_fijos (nombre, telefono, dia_semana, hora)
+        VALUES (?, ?, ?, ?)
+    """, (nombre, telefono, dia_semana, hora))
+    conexion.commit()
+    conexion.close()
+
+    return redirect("/admin")
+
+@app.route("/admin/eliminar_cliente_fijo/<int:id>")
+def eliminar_cliente_fijo(id):
+    if not session.get("admin"):
+        return redirect("/login")
+
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM clientes_fijos WHERE id = ?", (id,))
+    conexion.commit()
+    conexion.close()
 
     return redirect("/admin")
 
