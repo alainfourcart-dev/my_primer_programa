@@ -336,6 +336,8 @@ def obtener_disponibilidad():
 
     conn.close()
 
+    clientes_fijos = obtener_clientes_fijos()
+
     horas_manana = generar_horas ("10:00", "14:00", 40)
     horas_tarde = generar_horas ("16:30", "21:00", 40, primera_diferente=True)
     horas_extra = ["09:30", "16:00", "21:00"]
@@ -347,6 +349,10 @@ def obtener_disponibilidad():
         fecha = hoy + timedelta(days=i)
         fecha_str = fecha.strftime("%Y-%m-%d")
         nombre_dia = DIAS_ES[fecha.weekday()]
+        horas_clientes_fijos = [
+            c[4] for c in clientes_fijos
+            if c[3] == nombre_dia
+        ]
 
         if esta_cerrado(fecha_str, cierres):
             continue
@@ -375,7 +381,12 @@ def obtener_disponibilidad():
             bloqueado_db = (fecha_str, hora) in bloqueos
             liberado_db = (fecha_str,hora) in liberadas
             if (
-                (clave not in citas_ocupadas and hora not in bloqueadas and not bloqueado_db)
+                (
+                    clave not in citas_ocupadas
+                    and hora not in bloqueadas
+                    and not bloqueado_db
+                    and hora not in horas_clientes_fijos
+                )
                 or liberado_db
             ):
                 es_extra = hora in horas_extra
