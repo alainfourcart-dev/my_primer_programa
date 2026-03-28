@@ -309,6 +309,10 @@ function mostrarSeccion(idPanel, boton) {
                 <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-extras', this)">
                     Horas extras por día 
                 </button>
+
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-cliente-fijo', this)">
+                    Añadir cliente fijo 
+                </button>
             </div>
         </div>
 
@@ -523,5 +527,27 @@ function mostrarSeccion(idPanel, boton) {
             {% endif %}
         </div>
     </div>
+    <div id="panel-cliente-fijo" class="panel-formulario">
+        <h3>Añadir cliente fijo</h3>
+
+        <form method="POST" action="/admin/anadir_cliente_fijo" class="form-admin">
+            <input type="text" name="nombre" placeholder="Nombre" required>
+            <input type="text" name="telefono" placeholder="Teléfono" required>
+
+            <select name="dia_semana" required>
+                <option value="">Selecciona día</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miércoles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+                <option value="Sábado">Sábado</option>
+            </select>
+
+            <input type="time" name="hora" required>
+
+            <button type="submit">Guardar cliente fijo</button>
+        </form>
+    </div>
+
 </body>
 </html>
