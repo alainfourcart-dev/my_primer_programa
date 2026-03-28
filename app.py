@@ -36,6 +36,16 @@ def inicializar_db():
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
+    try:
+        cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN dia_semana TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN hora TEXT")
+    except:
+        pass
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS citas (
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
