@@ -277,173 +277,183 @@ function mostrarSeccion(idPanel, boton) {
         <a class="logout" href="/logout">Cerrar sesión</a>
 
         <div class="seccion">
+            <h2>Citas</h2>
+
+            <div class="acciones-citas">
+                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-pendientes', this)">
+                    Pendientes
+                </button>
+                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-confirmadas', this)">
+                    Confirmadas
+                </button>
+            </div>
+        </div>
+
+        <div class="seccion">
             <h2>Gestión de calendario</h2>
 
-            <div class="acciones-calendario">
-                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-cierre', this)">
-                    Cerrar fechas
-                </button>
-                
-                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-liberar', this)">
-                    Liberar cita fija
-                </button>
-
-                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-bloquear', this)">
-                    Bloquear hora especial
-                </button>
-
-                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-manual', this)">
+            <div class="acciones-gestion">
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-manual', this)">
                     Añadir cita manual
                 </button>
 
-                <button type="button" class="boton-accion" onclick="mostrarSeccion('panel-extras', this)">
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-cierre', this)">
+                    Cerrar fechas
+                </button>
+                
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-liberar', this)">
+                    Liberar cita fija
+                </button>
+
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-bloquear', this)">
+                    Bloquear hora especial
+                </button>
+
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-extras', this)">
                     Horas extras por día 
                 </button>
             </div>
-            
-            <div id="panel-extras" class="panel-formulario">
-                <h3>Horas extra por día</h3>
+        </div>
 
-                <form action="/admin/extra_dia" method="POST" class="form-admin">
-                    <input type="date" name="fecha" required>
-                    <button type="submit" class="boton-accion">
-                        Activar horas extra
-                    </button>
-                </form>
-
-                <form action="/admin/quitar_extra_dia" method="POST" class="form-admin">
-                    <input type="date" name="fecha" required>
-                    <button type="submit" class="boton-accion">
-                        Quitar horas extra
-                    </button>
-                </form>
-            </div>
-
-            <div id="panel-cierre" class="panel-formulario">
-                <h3>Cerrar fechas</h3>
-                <form action="/admin/cierre" method="POST">
-                    <input type="date" name="fecha_inicio" required>
-                    <input type="date" name="fecha_fin" required>
-                    <input type="text" name="motivo" placeholder="Motivo (vacaciones, festivo...)" required>
-                    <button type="submit">Guardar cierre</button>
-                </form>
-            </div>
-
-            <div id="panel-liberar" class="panel-formulario">
-                <h3>Liberar cita fija</h3>
-                <form action="/admin/liberar" method="POST">
-                    <input type="date" name="fecha" required>
-                    <input type="time" name="hora" required>
-                    <button type="submit">Liberar hora</button>
-                </form>
-            </div>
-
-            <div id="panel-bloquear" class="panel-formulario">
-                <h3>Bloquear hora especial</h3>
-                <form action="/admin/bloquear" method="POST">
-                    <input type="date" name="fecha" required>
-                    <input type="time" name="hora" required>
-                    <button type="submit">Bloquear hora</button>
-                </form>
-            </div>
-
-            <div id="panel-manual" class="panel-formulario">
-                <h3>Añadir cita manual</h3>
-                <form method="POST" action="/admin/anadir_cita" class="form-admin">
-                    <input type="text" name="nombre" placeholder="Nombre" required>
-                    <input type="text" name="telefono" placeholder="Teléfono" required>
-                    <input type="date" name="fecha" required>
-                    <input type="time" name="hora" required>
-                    <button type="submit">Guardar cita</button>
-                </form>
-            </div>
-
-            <div class="seccion">
-                <h2>Citas</h2>
-
-                <div class="acciones-listas">
-                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-pendientes', this)">
-                        Pendientes
-                    </button>
-                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-confirmadas', this)">
-                        Confirmadas
-                    </button>
-                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-cierres', this)">
-                        Cierres
-                    </button>
-                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-liberaciones', this)">
-                        Liberaciones
-                    </button>
-                    <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-bloqueos', this)">
-                        Bloqueos
-                    </button>
-                </div>
-
-                <div id="panel-pendientes" class="panel-lista">
-                    <div class="seccion">
-                        <h2>Pendientes</h2>
-
-                        {% if pendientes_agrupadas %}
-                            {% for dia in pendientes_agrupadas %}
-                                {% set citas_dia = pendientes_agrupadas[dia] %}
-                                <div class="dia">
-                                    <h3>{{ dia }}</h3>
-
-                                    {% for cita in citas_dia %}
-                                        <div class="cita pendiente">
-                                            <div>
-                                                <span class="hora">{{ cita["hora"] }}</span>
-                                                <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
-                                            </div>
-                
-                                            <div class="botones">
-                                                <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-ok">✅</a>
-                                                <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="vacio">No hay citas pendientes.</p>
-                        {% endif %}
-                    </div>
-                </div>
-                <div id="panel-confirmadas" class="panel-lista">
-                    <div class="seccion">
-                        <h2>Confirmadas</h2>
-
-                        {% if confirmadas_agrupadas %}
-                            {% for dia in confirmadas_agrupadas %}
-                                {% set citas_dia = confirmadas_agrupadas[dia] %}
-                                <div class="dia">
-                                    <h3>{{ dia }}</h3>
-
-                                    {% for cita in citas_dia %}
-                                        <div class="cita confirmada">
-                                            <div>
-                                                <span class="hora">{{ cita["hora"] }}</span>
-                                                <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
-                                            </div>
-                
-                                            <div class="botones">
-                                                <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="vacio">No hay citas confirmadas.</p>
-                        {% endif %}
-                    </div>
-                </div>     
+        <div class="seccion">
+            <h2>Cambios realizados</h2>
+            <div class="acciones-cambios">
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-cierres', this)">
+                    Cierres
+                </button>
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-liberaciones', this)">
+                    Liberaciones
+                </button>
+                <button type="button" class="boton-accion-secundario" onclick="mostrarSeccion('panel-bloqueos', this)">
+                    Bloqueos
+                </button>
             </div>
         </div>
-        <hr>
-        <div id="panel-cierres" class="panel-lista">
+            
+        <div id="panel-extras" class="panel-formulario">
+            <h3>Horas extra por día</h3>
+
+            <form action="/admin/extra_dia" method="POST" class="form-admin">
+                <input type="date" name="fecha" required>
+                <button type="submit" class="boton-accion">
+                    Activar horas extra
+                </button>
+            </form>
+
+            <form action="/admin/quitar_extra_dia" method="POST" class="form-admin">
+                <input type="date" name="fecha" required>
+                <button type="submit" class="boton-accion">
+                    Quitar horas extra
+                </button>
+            </form>
+        </div>
+
+        <div id="panel-cierre" class="panel-formulario">
+            <h3>Cerrar fechas</h3>
+            <form action="/admin/cierre" method="POST">
+                <input type="date" name="fecha_inicio" required>
+                <input type="date" name="fecha_fin" required>
+                <input type="text" name="motivo" placeholder="Motivo (vacaciones, festivo...)" required>
+                <button type="submit">Guardar cierre</button>
+            </form>
+        </div>
+
+        <div id="panel-liberar" class="panel-formulario">
+            <h3>Liberar cita fija</h3>
+            <form action="/admin/liberar" method="POST">
+                <input type="date" name="fecha" required>
+                <input type="time" name="hora" required>
+                <button type="submit">Liberar hora</button>
+            </form>
+        </div>
+
+        <div id="panel-bloquear" class="panel-formulario">
+            <h3>Bloquear hora especial</h3>
+            <form action="/admin/bloquear" method="POST">
+                <input type="date" name="fecha" required>
+                <input type="time" name="hora" required>
+                <button type="submit">Bloquear hora</button>
+            </form>
+        </div>
+
+        <div id="panel-manual" class="panel-formulario">
+            <h3>Añadir cita manual</h3>
+            <form method="POST" action="/admin/anadir_cita" class="form-admin">
+                <input type="text" name="nombre" placeholder="Nombre" required>
+                <input type="text" name="telefono" placeholder="Teléfono" required>
+                <input type="date" name="fecha" required>
+                <input type="time" name="hora" required>
+                <button type="submit">Guardar cita</button>
+            </form>
+        </div>
+
+        <div id="panel-pendientes" class="panel-lista">
             <div class="seccion">
-                <h2>Cierres</h2>
+                <h2>Pendientes</h2>
+
+                {% if pendientes_agrupadas %}
+                    {% for dia in pendientes_agrupadas %}
+                        {% set citas_dia = pendientes_agrupadas[dia] %}
+                        <div class="dia">
+                            <h3>{{ dia }}</h3>
+
+                            {% for cita in citas_dia %}
+                                <div class="cita pendiente">
+                                    <div>
+                                        <span class="hora">{{ cita["hora"] }}</span>
+                                        <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                    </div>
+                
+                                    <div class="botones">
+                                        <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-ok">✅</a>
+                                        <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="vacio">No hay citas pendientes.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div id="panel-confirmadas" class="panel-lista">
+                <div class="seccion">
+                    <h2>Confirmadas</h2>
+
+                    {% if confirmadas_agrupadas %}
+                        {% for dia in confirmadas_agrupadas %}
+                            {% set citas_dia = confirmadas_agrupadas[dia] %}
+                            <div class="dia">
+                                <h3>{{ dia }}</h3>
+
+                                {% for cita in citas_dia %}
+                                    <div class="cita confirmada">
+                                        <div>
+                                            <span class="hora">{{ cita["hora"] }}</span>
+                                            <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                        </div>
+                
+                                        <div class="botones">
+                                            <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="vacio">No hay citas confirmadas.</p>
+                    {% endif %}
+                </div>
+            </div>     
+        </div>
+    </div>
+
+    <div id="panel-cierres" class="panel-lista">
+        <div class="seccion">
+            <h2>Cierres</h2>
+
+            {% if cierres %}
                 <ul>
                     {% for c in cierres %}
                         <li>
@@ -452,12 +462,17 @@ function mostrarSeccion(idPanel, boton) {
                         </li>
                     {% endfor %}
                 </ul>
-            </div>
+            {% else %}
+               <p class="vacio">No hay cierres.</p>
+            {% endif %} 
         </div>
+    </div>
 
-        <div id="panel-liberaciones" class="panel-lista">
-            <div class="seccion">
-                <h2>Liberaciones</h2>
+    <div id="panel-liberaciones" class="panel-lista">
+        <div class="seccion">
+            <h2>Liberaciones</h2>
+
+            {% if liberaciones %}
                 <ul>
                     {% for l in liberaciones %}
                     <li>
@@ -466,12 +481,16 @@ function mostrarSeccion(idPanel, boton) {
                     </li>
                     {% endfor %}
                 </ul>
-            </div>
+            {% else %}
+               <p class="vacio">No hay liberaciones.</p>
+            {% endif %}
         </div>
+    </div>
 
-        <div id="panel-bloqueos" class="panel-lista">
-            <div class="seccion">
-                <h2>Bloqueos especiales</h2>
+    <div id="panel-bloqueos" class="panel-lista">
+        <div class="seccion">
+            <h2>Bloqueos especiales</h2>
+            {% if bloqueos %}
                 <ul>
                     {% for b in bloqueos %}
                         <li>
@@ -480,7 +499,9 @@ function mostrarSeccion(idPanel, boton) {
                         </li>
                     {% endfor %}
                 </ul>
-            </div>
+            {% else %}
+               <p class="vacio">No hay bloqueos especiales.</p>
+            {% endif %}
         </div>
     </div>
 </body>
