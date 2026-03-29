@@ -590,14 +590,22 @@ def admin():
             if fijo[3] == nombre_dia:
                 etiqueta_dia = f"{nombre_dia} {fecha.strftime('%d/%m')}"
 
-                if (fecha_str, fijo[4]) not in citas_confirmadas_reales:
+                ya_hay_real = False
+
+                if etiqueta_dia in confirmadas_agrupadas:
+                    for cita in confirmadas_agrupadas[etiqueta_dia]:
+                        if cita["hora"] == fijo[4] and cita.get("tipo") != "fijo":
+                            ya_hay_real = True
+                            break
+
+                if not ya_hay_real:
                     confirmadas_agrupadas.setdefault(etiqueta_dia, []).append({
-                    "dia": fecha_str,
-                    "hora": fijo[4],
-                    "nombre": fijo[1],
-                    "telefono": fijo[2],
-                    "tipo": "fijo"
-                })
+                        "dia": fecha_str,
+                        "hora": fijo[4],
+                        "nombre": fijo[1],
+                        "telefono": fijo[2],
+                        "tipo": "fijo"
+                    })
 
     for dia in confirmadas_agrupadas:
         confirmadas_agrupadas[dia] = sorted(
