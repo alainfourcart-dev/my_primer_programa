@@ -377,20 +377,22 @@ def obtener_disponibilidad():
 
             bloqueado_db = (fecha_str, hora) in bloqueos
             liberado_db = (fecha_str,hora) in liberadas
-            if (
-                (
-                    clave not in citas_ocupadas
-                    and hora not in bloqueadas
-                    and not bloqueado_db
-                    and hora not in horas_clientes_fijos
-                )
-                or liberado_db
-            ):
-                es_extra = hora in horas_extra
-                libres.append({
-                    "hora": hora,
-                    "extra": es_extra
-                })
+            es_hora_fija = hora in horas_clientes_fijos
+
+            if clave in citas_ocupadas:
+                continue
+
+            if hora in bloqueadas or bloqueado_db:
+                continue
+
+            if es_hora_fija and not liberado_db:
+                continue
+
+            es_extra = hora in horas_extra
+            libres.append({
+                "hora": hora,
+                "extra": es_extra
+            })
 
         disponibilidad[etiqueta] = {
             "fecha": fecha_str,
