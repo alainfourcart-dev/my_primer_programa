@@ -452,7 +452,7 @@ function mostrarSeccion(idPanel, boton) {
                                             <span class="hora">{{ cita["hora"] }}</span>
                                             <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
 
-                                            {% if cita.get("tipo") == "fijo %"}
+                                            {% if cita.get("tipo") == "fijo" %"}
                                                 <span class="etiqueta-fijo">FIJO</span>
                                             {% endif %}
                                         </div>
