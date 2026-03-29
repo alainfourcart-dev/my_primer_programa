@@ -94,6 +94,16 @@
             align-items: center;
             justify-content: space-between;
         }
+        .etiqueta-fijo{
+            display: inline-block;
+            margin-left: 8px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #111827;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
         .datos {
             display: flex;
             flex-wrap: wrap;
@@ -413,7 +423,9 @@ function mostrarSeccion(idPanel, boton) {
                 
                                     <div class="botones">
                                         <a href="/confirmar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-ok">✅</a>
-                                        <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                        {% if cita.get("tipo") != "fijo" %}
+                                            <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endfor %}
@@ -439,6 +451,10 @@ function mostrarSeccion(idPanel, boton) {
                                         <div>
                                             <span class="hora">{{ cita["hora"] }}</span>
                                             <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+
+                                            {% if cita.get("tipo") == "fijo %"}
+                                                <span class="etiqueta-fijo">FIJO</span>
+                                            {% endif %}
                                         </div>
                 
                                         <div class="botones">

@@ -569,6 +569,32 @@ def admin():
     bloqueos = obtener_bloqueos_especiales()
     clientes_fijos = obtener_clientes_fijos()
 
+    hoy = date.today()
+
+    for i in range(30):
+        fecha = hoy + timedelta(days=i)
+        fecha_str = fecha.strftime("%y-%m-%d")
+
+        nombre_dia = DIAS_ES[fecha.weekday()]
+
+        for fijo in clientes_fijos:
+            if fijo[3] == nombre_dia:
+                confirmadas_agrupadas.setdefault(
+                    f"{nombre_dia} {fecha.strftime('%d/%m')}", [] 
+                ).append({
+                    "dia": fecha_str,
+                    "hora": fijo[4],
+                    "nombre": fijo[1],
+                    "telefono": fijo[2],
+                    "tipo": "fijo"
+                })
+
+    for dia in confirmadas_agrupadas:
+        confirmadas_agrupadas[dia] = sorted(
+            confirmadas_agrupadas[dia],
+            key=lambda x: x["hora"]
+        )           
+
     return render_template(
         "admin.html",
         pendientes_agrupadas=pendientes_agrupadas,
