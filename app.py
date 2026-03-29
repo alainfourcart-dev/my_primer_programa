@@ -566,6 +566,13 @@ def admin():
 
     pendientes_agrupadas = agrupar_por_dia(pendientes)
     confirmadas_agrupadas = agrupar_por_dia(confirmadas)
+    citas_confirmadas_reales = set()
+    
+    for dia, lista in confirmadas_agrupadas.items():
+        for cita in lista:
+            if cita.get("tipo") != "fijo":
+                citas_confirmadas_reales.add((cita["dia"], cita["hora"]))
+
     cierres = obtener_cierres()
     liberaciones = obtener_liberaciones()
     bloqueos = obtener_bloqueos_especiales()
@@ -581,17 +588,9 @@ def admin():
 
         for fijo in clientes_fijos:
             if fijo[3] == nombre_dia:
-                ya_existe_cita_real = False
-
                 etiqueta_dia = f"{nombre_dia} {fecha.strftime('%d/%m')}"
 
-                if etiqueta_dia in confirmadas_agrupadas:
-                    for cita in confirmadas_agrupadas[etiqueta_dia]:
-                        if cita["dia"] == fecha_str and cita["hora"] == fijo[4]:
-                            ya_existe_cita_real = True
-                            break
-
-                if not ya_existe_cita_real:
+                if (fecha_str, fijo[4]) not in citas_confirmadas_reales:
                     confirmadas_agrupadas.setdefault(etiqueta_dia, []).append({
                     "dia": fecha_str,
                     "hora": fijo[4],
