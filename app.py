@@ -579,9 +579,18 @@ def admin():
 
         for fijo in clientes_fijos:
             if fijo[3] == nombre_dia:
-                confirmadas_agrupadas.setdefault(
-                    f"{nombre_dia} {fecha.strftime('%d/%m')}", [] 
-                ).append({
+                ya_existe_cita_real = False
+
+                etiqueta_dia = f"{nombre_dia} {fecha.strftime('%d/%m')}"
+
+                if etiqueta_dia in confirmadas_agrupadas:
+                    for cita in confirmadas_agrupadas[etiqueta_dia]:
+                        if cita["dia"] == fecha_str and cita["hora"] == fijo[4]:
+                            ya_existe_cita_real = True
+                            break
+
+                if not ya_existe_cita_real:
+                    confirmadas_agrupadas.setdefault(etiqueta_dia, []).append({
                     "dia": fecha_str,
                     "hora": fijo[4],
                     "nombre": fijo[1],
