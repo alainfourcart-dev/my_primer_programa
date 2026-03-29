@@ -17,10 +17,7 @@ TWILIO_WHATSAPP_FROM = "whatsapp:+14155238886"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai_client = OpenAI()
 
-BLOQUEOS_FIJOS = {
-    "Jueves": ["12:00", "12:40", "13:20", "16:30", "17:00", "17:40", "18:20", "19:00", "19:40", "20:20"],
-    "Viernes": ["10:00", "12:00", "12:40", "13:20", "16:30", "17:00", "18:20", "19:00", "19:40"]
-}
+BLOQUEOS_FIJOS = {}
 
 DIAS_ES = {
     0: "Lunes",
