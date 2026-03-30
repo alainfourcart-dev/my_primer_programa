@@ -86,6 +86,16 @@ def inicializar_db():
             hora TEXT NOT NULL
         )
     """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS clientes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT,
+            telefono TEXT UNIQUE,
+            faltas INTEGER DEFAULT 0,
+            ultima_cancelacion TEXT,
+            aviso TEXT DEFAULT ''
+        )
+    """)
 
     try:
         cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN dia_semana TEXT")
@@ -99,6 +109,21 @@ def inicializar_db():
 
     try:
         cursor.execute("ALTER TABLE citas ADD COLUMN codigo_cancelacion TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE clientes ADD COLUMN faltas INTEGER DEFAULT 0")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE clientes ADD COLUMN ultima_cancelacion TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE clientes ADD COLUMN aviso TEXT DEFAULT ''")
     except:
         pass
 
