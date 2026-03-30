@@ -905,13 +905,14 @@ def cancelar_cita(codigo):
         WHERE codigo_cancelacion = ?
     """, (codigo,))
 
-    cita = cursor.fetchall
+    cita = cursor.fetchone()
 
     if not cita:
         conexion.close()
         return "Cita no encontrada"
     
-    dia, hora = cita
+    dia = cita[0] 
+    hora = cita[1]
 
     fecha_cita = datetime.strptime(f"{dia} {hora}", "%Y-%m-%d %H:%M")
     ahora = datetime.now()
