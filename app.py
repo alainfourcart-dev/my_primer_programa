@@ -123,7 +123,10 @@ def cargar_citas():
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
-    cursor.execute("SELECT dia, hora FROM citas")
+    cursor.execute("""
+    SELECT dia, hora FROM citas
+    WHERE estado != 'cancelada'
+    """)
     filas = cursor.fetchall()
 
     conexion.close()
@@ -192,7 +195,7 @@ def guardar_cita(fecha, hora, nombre, telefono):
     cursor = conexion.cursor()
 
     cursor.execute(
-        "SELECT COUNT (*) FROM citas WHERE dia=? AND hora=?",
+        "SELECT COUNT (*) FROM citas WHERE dia=? AND hora=? AND estado !='cancelada'",
         (fecha, hora)
     )
     existe = cursor.fetchone()[0]
@@ -540,6 +543,7 @@ def admin():
     cursor.execute("""
         SELECT dia, hora, nombre, telefono, estado
         FROM citas
+        WHERE estado != 'cancelada'
         ORDER BY dia, hora
     """)
     citas = cursor.fetchall()
@@ -841,10 +845,11 @@ def confirmar(dia, hora):
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
-    cursor.execute(
-        "SELECT nombre, telefono FROM citas WHERE dia=? AND hora=?",
-        (dia, hora)
-    )
+    cursor.execute("""
+        SELECT nombre, telefono
+        FROM citas
+        WHERE dia=? AND hora=? AND estado != 'cancelada'
+    """, (dia, hora))
     fila = cursor.fetchone()
 
     cursor.execute(
@@ -885,10 +890,11 @@ def cancelar(dia, hora):
         mensaje = f"Hola {nombre}, tu solicitud de cita en Rocha Peluqueros para {dia_bonito} a las {hora} ha sido cancelada."
         enviar_whatsapp(telefono, mensaje)
 
-    cursor.execute(
-        "DELETE FROM citas WHERE dia=? AND hora=?",
-        (dia, hora)
-    )
+    cursor.execute("""
+        UPDATE citas 
+        SET estado = 'cancelada'
+        WHERE dia=? AND hora=?
+        """, (dia, hora))
 
     conexion.commit()
     conexion.close()
@@ -901,8 +907,9 @@ def cancelar_cita(codigo):
     cursor = conexion.cursor()
 
     cursor.execute("""
-        SELECT dia, hora FROM citas
-        WHERE codigo_cancelacion = ?
+        SELECT dia, hora
+        FROM citas
+        WHERE codigo_cancelacion = ? AND estado != 'cancelada'
     """, (codigo,))
 
     cita = cursor.fetchone()
@@ -922,12 +929,13 @@ def cancelar_cita(codigo):
         return "No puedes cancelar con menos de 4 horas de antelación"
 
     cursor.execute("""
-        DELETE FROM citas WHERE codigo_cancelacion = ?
-        """, (codigo,))
+        UPDATE citas
+        SET estado = 'cancelada'
+        WHERE codigo_cancelacion = ?
+    """, (codigo,))
     
     conexion.commit()
     conexion.close()
-
     return "Cita cancelada correctamente"
     
 @app.route("/whatsapp", methods=["POST"])
