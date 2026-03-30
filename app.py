@@ -202,6 +202,7 @@ def guardar_cita(fecha, hora, nombre, telefono):
         return False
     
     codigo_cancelacion = str(uuid.uuid4())
+    print("CODIGO CANCELACION:", codigo_cancelacion)
 
     cursor.execute("""
         INSERT INTO citas (dia, hora, nombre, telefono, codigo_cancelacion, estado)
