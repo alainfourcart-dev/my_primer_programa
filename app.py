@@ -127,6 +127,11 @@ def inicializar_db():
     except:
         pass
 
+    try:
+        cursor.execute("ALTER TABLE citas ADD COLUMN asistencia TEXT")
+    except:
+        pass
+
     conexion.commit()
     conexion.close()
 
@@ -236,6 +241,11 @@ def guardar_cita(fecha, hora, nombre, telefono):
         INSERT INTO citas (dia, hora, nombre, telefono, codigo_cancelacion, estado)
         VALUES (?, ?, ?, ?, ?, ?)
         """, (fecha, hora, nombre, telefono, codigo_cancelacion, "pendiente"))
+
+    cursor.execute("""
+        INSERT OR IGNORE INTO clientes (nombre, telefono)
+        VALUES (?, ?)
+    """, (nombre, telefono))
 
     conexion.commit()
     conexion.close()
@@ -566,10 +576,12 @@ def admin():
     cursor = conexion.cursor()
 
     cursor.execute("""
-        SELECT dia, hora, nombre, telefono, estado
+        SELECT citas.dia, citas.hora, citas.nombre, citas.telefono, citas.estado,
+                COALESCE(clientes.faltas, 0) as faltas
         FROM citas
-        WHERE estado != 'cancelada'
-        ORDER BY dia, hora
+        LEFT JOIN clientes ON citas.telefono = clientes.telefono
+        WHERE citas.estado != 'cancelada'
+        ORDER BY citas.dia, citas.hora
     """)
     citas = cursor.fetchall()
     citas = sorted(citas, key=lambda x: (x[0], [1]))
@@ -581,7 +593,7 @@ def admin():
         dias = defaultdict(list)
 
         for cita in lista_citas:
-            dia_str, hora, nombre, telefono, estado = cita
+            dia_str, hora, nombre, telefono, estado, faltas = cita
 
             fecha_obj = datetime.strptime(dia_str, "%Y-%m-%d")
             nombres_dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -600,7 +612,8 @@ def admin():
                 "hora": hora,
                 "nombre": nombre,
                 "telefono": telefono,
-                "estado": estado
+                "estado": estado,
+                "faltas": faltas
             })
         return dict(dias)
 
@@ -722,6 +735,37 @@ def eliminar_cliente_fijo(id):
     conexion.commit()
     conexion.close()
 
+    return redirect("/admin")
+
+@app.route("/asistencia/<dia>/<hora>/<estado>")
+def marcar_asistencia(dia, hora, estado):
+    if not session.get("admin"):
+        return redirect("/login")
+    
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        UPDATE citas
+        SET asistencia = ?
+        WHERE dia=? AND hora=?
+    """, (estado, dia, hora))
+
+    if estado == "no_asistio":
+        cursor.execute("""
+            SELECT telefono FROM citas
+            WHERE dia=? AND hora=?
+        """, (dia, hora))
+        telefono = cursor.fetchone()[0]
+
+        cursor.execute("""
+            UPDATE clientes
+            SET faltas = faltas + 1
+            WHERE telefono = ?
+        """, (telefono,))
+
+    conexion.commit()
+    conexion.close()
     return redirect("/admin")
 
 @app.route("/admin/cierre", methods=["POST"])

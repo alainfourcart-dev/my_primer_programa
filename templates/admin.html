@@ -104,6 +104,16 @@
             font-size: 11px;
             font-weight: bold;
         }
+        .etiqueta-aviso {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #ffc107;
+            color: #111827;
+            font-size: 11px;
+            font-weight: bold;
+        }
         .datos {
             display: flex;
             flex-wrap: wrap;
@@ -131,6 +141,22 @@
             border-radius: 5px;
             padding: 5px 10px;
             text-decoration: none;
+        }
+        .btn-asistio {
+            color: white;
+            border-radius: 5px;
+            padding: 5px 10px;
+            text-decoration: none;
+            background-color: #28a745;
+            margin-left: 5px;
+        }
+        .btn-no{
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-left: 5px;
         }
         .btn-x {
             color: white;
@@ -452,13 +478,18 @@ function mostrarSeccion(idPanel, boton) {
                                             <span class="hora">{{ cita["hora"] }}</span>
                                             <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
 
+                                            {% if cita.get("faltas", 0) > 0 %}
+                                                <span class="etiqueta-aviso">⚠️ {{ cita["faltas"] }} falta{{ "s" if cita["faltas"] > 1 else "" }}</span>
+                                            {% endif %}
+
                                             {% if cita.get("tipo") == "fijo" %}
                                                 <span class="etiqueta-fijo">FIJO</span>
                                             {% endif %}
                                         </div>
                 
                                         <div class="botones">
-                                            <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
+                                            <a href="/asistencia/{{ cita['dia'] }}/{{ cita['hora'] }}/asistio" class="btn-asistio">Asistió</a>
+                                            <a href="/asistencia/{{ cita['dia'] }}/{{ cita['hora'] }}/no_asistio" class="btn-no">No asistió</a>
                                         </div>
                                     </div>
                                 {% endfor %}
