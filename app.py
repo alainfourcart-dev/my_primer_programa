@@ -5,6 +5,8 @@ from twilio.rest import Client
 from openai import OpenAI 
 import os
 import sqlite3
+import uuid
+
 ADMIN_PASSWORD = "1234"
 SECRET_KEY = "mi_clave_secreta_123"
 
@@ -40,6 +42,7 @@ def inicializar_db():
             hora TEXT NOT NULL,
             nombre TEXT,
             telefono TEXT,
+            codigo_cancelacion TEXT,
             estado TEXT DEFAULT 'pendiente'
         )
     """)
@@ -91,6 +94,11 @@ def inicializar_db():
 
     try:
         cursor.execute("ALTER TABLE clientes_fijos ADD COLUMN hora TEXT")
+    except:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE citas ADD COLUMN codigo_cancelacion TEXT")
     except:
         pass
 
@@ -192,11 +200,13 @@ def guardar_cita(fecha, hora, nombre, telefono):
     if existe > 0:
         conexion.close()
         return False
+    
+    codigo_cancelacion = str(uuid.uuid4())
 
-    cursor.execute(
-        "INSERT INTO citas (dia, hora, nombre, telefono, estado) VALUES (?, ?, ?, ?, ?)",
-        (fecha, hora, nombre, telefono, "pendiente")
-    )
+    cursor.execute("""
+        INSERT INTO citas (dia, hora, nombre, telefono, codigo_cancelacion, estado)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (fecha, hora, nombre, telefono, codigo_cancelacion, "pendiente"))
 
     conexion.commit()
     conexion.close()
@@ -884,6 +894,40 @@ def cancelar(dia, hora):
 
     return redirect("/admin")
 
+@app.route("/cancelar/<codigo>")
+def cancelar_cita(codigo):
+    conexion = sqlite3.connect("citas.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT dia, hora FROM citas
+        WHERE codigo_cancelacion = ?
+    """, (codigo,))
+
+    cita = cursor.fetchall
+
+    if not cita:
+        conexion.close()
+        return "Cita no encontrada"
+    
+    dia, hora = cita
+
+    fecha_cita = datetime.strptime(f"{dia} {hora}", "%Y-%m-%d %H:%M")
+    ahora = datetime.now()
+
+    if fecha_cita - ahora < timedelta(hours=4):
+        conexion.close()
+        return "No puedes cancelar con menos de 4 horas de antelación"
+
+    cursor.execute("""
+        DELETE FROM citas WHERE codigo_cancelacion = ?
+        """, (codigo,))
+    
+    conexion.commit()
+    conexion.close()
+
+    return "Cita cancelada correctamente"
+    
 @app.route("/whatsapp", methods=["POST"])
 def whatsapp_webhook():
     try:
