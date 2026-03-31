@@ -138,6 +138,11 @@ def inicializar_db():
     except:
         pass
 
+    try:
+        cursor.execute("ALTER TABLE citas ADD COLUMN recordatorio_enviado INTEGER DEFAULT 0")
+    except:
+        pass
+
     conexion.commit()
     conexion.close()
 
@@ -298,6 +303,57 @@ def normalizar_telefono_whatsapp(telefono):
     if telefono.startswith("6") or telefono.startswith("7"):
         return f"whatsapp:+34{telefono}"
     return f"whatsapp:{telefono}"
+
+def enviar_recordatorios_citas():
+    ahora = datetime.now()
+    limite = ahora + timedelta(hours=24)
+
+    conexion = sqlite3.connect(DB_PATH)
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        SELECT nombre, telefono, dia, hora
+        FROM citas
+        WHERE estado = 'confirmada'
+            AND recordatorio_enviado = 0
+    """)
+    citas = cursor.fetchall()
+
+    enviados = 0
+
+    for nombre, telefono, dia, hora in citas:
+        try:
+            fecha_hora_cita = datetime.strptime(f"{dia} {hora}", "%Y-%m-%d %H-%M")
+        except:
+            continue
+
+        if ahora <= fecha_hora_cita <= limite:
+            fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
+            dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
+
+            mensaje = f"""📌 Recordatoriode cita - Rocha Peluqueros 📌
+            Hola {nombre}, te recordamos tu cita para:
+            📅 {dia_bonito}
+            ⏰ {hora}
+            Te esperamos, un saludo."""
+
+            try:
+                enviar_whatsapp(telefono, mensaje)
+
+                cursor.execute("""
+                    UPDATE citas
+                    SET recordatorio_enviado = 1
+                    WHERE telefono = ? AND dia = ? AND hora = ?
+                """, (telefono, dia, hora))
+
+                enviados += 1
+            except Exception as e:
+                print("Error enviando recordatorio:", e)
+
+    conexion.commit()
+    conexion.close()
+
+    return enviados
 
 def enviar_whatsapp(telefono, mensaje):
     try:
@@ -752,6 +808,14 @@ def admin_anadir_cita():
     conn.close()
 
     return redirect("/admin")
+
+@app.route("/enviar_recordatorios")
+def lanzar_recordatorios():
+    if not session.get("admin"):
+        return redirect ("/login")
+
+    enviados = enviar_recordatorios_citas()
+    return f"Recordatorios enviados: {enviados}"
 
 @app.route("/admin/anadir_cliente_fijo", methods=["POST"])
 def anadir_cliente_fijo():
