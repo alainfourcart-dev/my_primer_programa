@@ -580,7 +580,6 @@ def admin():
                 COALESCE(clientes.faltas, 0) as faltas
         FROM citas
         LEFT JOIN clientes ON citas.telefono = clientes.telefono
-        WHERE citas.estado != 'cancelada'
         ORDER BY citas.dia, citas.hora
     """)
     citas = cursor.fetchall()
@@ -588,6 +587,7 @@ def admin():
 
     pendientes = [c for c in citas if c[4] == "pendiente"]
     confirmadas = [c for c in citas if c[4] == "confirmada"]
+    canceladas = [c for c in citas if c[4] == "cancelada"]
 
     def agrupar_por_dia(lista_citas):
         dias = defaultdict(list)
@@ -619,6 +619,7 @@ def admin():
 
     pendientes_agrupadas = agrupar_por_dia(pendientes)
     confirmadas_agrupadas = agrupar_por_dia(confirmadas)
+    canceladas_agrupadas = agrupar_por_dia(canceladas)
     citas_confirmadas_reales = set()
     
     for dia, lista in confirmadas_agrupadas.items():
@@ -670,6 +671,7 @@ def admin():
         "admin.html",
         pendientes_agrupadas=pendientes_agrupadas,
         confirmadas_agrupadas=confirmadas_agrupadas,
+        canceladas_agrupadas=canceladas_agrupadas,
         cierres=cierres,
         liberaciones=liberaciones,
         bloqueos=bloqueos,

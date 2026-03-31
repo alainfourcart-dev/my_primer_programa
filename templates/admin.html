@@ -74,7 +74,10 @@
             margin-bottom: 10px;
             background: #f9fafb;
         }
-
+        .cita.cancelada {
+            background: #fdeaea;
+            border-left: 4px solid #dc3545;
+        }
         .pendiente {
             background: #fff3cd;
         }
@@ -503,7 +506,38 @@ function mostrarSeccion(idPanel, boton) {
                         <p class="vacio">No hay citas confirmadas.</p>
                     {% endif %}
                 </div>
-            </div>     
+            </div>
+            
+            <div id="panel-canceladas" class="panel-lista">
+                <div class="seccion">
+                    <h2>Cancelaciones</h2>
+
+                    {% if canceladas_agrupadas %}
+                        {% for dia, citas_dia in canceladas_agrupadas.items() %}
+                            <div class="dia">
+                                <h3>{{ dia }}</h3>
+
+                                {% for cita in citas_dia %}
+                                    <div class="cita cancelada">
+                                        <div>
+                                            <span class="hora">{{ cita["hora"] }}</span>
+                                            <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+
+                                            {% if cita.get("faltas", 0) > 0 %}
+                                                <span class="etiqueta-aviso">
+                                                    ⚠️ {{ cita["faltas"] }} falta{{ "s" if cita["faltas"] > 1 else "" }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No hay cancelaciones.</p>
+                    {% endif %}
+                </div>
+            </div> 
         </div>
     </div>
 
