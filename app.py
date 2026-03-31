@@ -575,6 +575,15 @@ def admin():
     conexion = sqlite3.connect("citas.db")
     cursor = conexion.cursor()
 
+    hoy_str = date.today().strftime("%Y-%m-%d")
+
+    cursor.execute("""
+        DELETE FROM citeas
+        WHERE estado = 'cancelada'
+        AND dia < ?
+    """, (hoy_str,))
+    conexion.commit()
+
     cursor.execute("""
         SELECT citas.dia, citas.hora, citas.nombre, citas.telefono, citas.estado,
                 COALESCE(clientes.faltas, 0) as faltas
@@ -588,6 +597,7 @@ def admin():
     pendientes = [c for c in citas if c[4] == "pendiente"]
     confirmadas = [c for c in citas if c[4] == "confirmada"]
     canceladas = [c for c in citas if c[4] == "cancelada"]
+    total_canceladas = len(canceladas)
 
     def agrupar_por_dia(lista_citas):
         dias = defaultdict(list)
@@ -672,6 +682,7 @@ def admin():
         pendientes_agrupadas=pendientes_agrupadas,
         confirmadas_agrupadas=confirmadas_agrupadas,
         canceladas_agrupadas=canceladas_agrupadas,
+        total_canceladas=total_canceladas,
         cierres=cierres,
         liberaciones=liberaciones,
         bloqueos=bloqueos,
