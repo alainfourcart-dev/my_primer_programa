@@ -500,6 +500,7 @@ function mostrarSeccion(idPanel, boton) {
                                         <div class="botones">
                                             <a href="/asistencia/{{ cita['dia'] }}/{{ cita['hora'] }}/asistio" class="btn-asistio">Asistió</a>
                                             <a href="/asistencia/{{ cita['dia'] }}/{{ cita['hora'] }}/no_asistio" class="btn-no">No asistió</a>
+                                            <a href="/cancelar/{{ cita['dia'] }}/{{ cita['hora'] }}" class="btn-x">❌</a>
                                         </div>
                                     </div>
                                 {% endfor %}
