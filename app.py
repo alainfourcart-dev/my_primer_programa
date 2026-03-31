@@ -8,6 +8,7 @@ import sqlite3
 import uuid
 
 DB_PATH = "/var/data/citas.db"
+URL_RESERVA = "https://rochapeluqueros.com"
 
 ADMIN_PASSWORD = "1234"
 SECRET_KEY = "mi_clave_secreta_123"
@@ -302,7 +303,7 @@ Datos del negocio:
 - Horario: martes a viernes de 10:00 a 14:00 y de 16:30 a 21:00. Sábado de 10:00 a 14:00.
 - Servicios: corte, barba, corte + barba, corte + mechas, corte + color.
 - Las citas se solicitan desde un enlace con calendario.
-- Si el cliente quiere reservar, indícale este enlace: https://my-primer-programa.onrender.com
+- Si el cliente quiere reservar, indícale este enlace: {URL_RESERVA}
 - Sé breve, amable y claro.
 - Responde en español.
 - Si no sabes algo, dilo sin inventar.
@@ -1054,7 +1055,7 @@ def whatsapp_webhook():
             texto_respuesta = respuesta_ia_whatsapp(mensaje)
         except Exception as e:
             print("Error IA:", e)
-            texto_respuesta = "Ahora mismo no puedo responder, pero puedes reservar aquí: https://my-primer-programa.onrender.com"
+            texto_respuesta = f"Ahora mismo no puedo responder, pero puedes reservar aquí: {URL_RESERVA}"
 
         print("Respuesta IA:", texto_respuesta)
 
