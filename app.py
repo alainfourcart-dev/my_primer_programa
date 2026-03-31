@@ -578,7 +578,7 @@ def admin():
     hoy_str = date.today().strftime("%Y-%m-%d")
 
     cursor.execute("""
-        DELETE FROM citeas
+        DELETE FROM citas
         WHERE estado = 'cancelada'
         AND dia < ?
     """, (hoy_str,))
