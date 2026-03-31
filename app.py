@@ -7,6 +7,8 @@ import os
 import sqlite3
 import uuid
 
+DB_PATH = "/var/data/citas.db"
+
 ADMIN_PASSWORD = "1234"
 SECRET_KEY = "mi_clave_secreta_123"
 
@@ -33,7 +35,7 @@ DIAS_ES = {
 }
 
 def inicializar_db():
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -151,7 +153,7 @@ def cargar_datos():
     return datos
 
 def cargar_citas():
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -166,7 +168,7 @@ def cargar_citas():
     return citas
 
 def obtener_dias_extras():
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
     cursor.execute("SELECT fecha FROM extras_dias")
     datos = cursor.fetchall()
@@ -174,7 +176,7 @@ def obtener_dias_extras():
     return [fila[0] for fila in datos]
 
 def fecha_esta_cerrada(fecha_str):
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -190,7 +192,7 @@ def fecha_esta_cerrada(fecha_str):
     return resultado is not None
 
 def hora_liberada(fecha_str, hora):
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -206,7 +208,7 @@ def hora_liberada(fecha_str, hora):
     return resultado is not None
 
 def hora_bloqueada_especial(fecha_str, hora):
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -222,7 +224,7 @@ def hora_bloqueada_especial(fecha_str, hora):
     return resultado is not None
 
 def guardar_cita(fecha, hora, nombre, telefono):
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute(
@@ -341,7 +343,7 @@ def esta_cerrado (dia, cierres):
         return False
 
 def obtener_cierres():
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, fecha_inicio, fecha_fin, motivo FROM cierres")
     datos = c.fetchall()
@@ -349,7 +351,7 @@ def obtener_cierres():
     return datos
 
 def obtener_liberaciones():
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, fecha, hora FROM liberaciones")
     datos = c.fetchall()
@@ -357,7 +359,7 @@ def obtener_liberaciones():
     return datos
 
 def obtener_bloqueos_especiales():
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("SELECT id, fecha, hora FROM bloqueos_especiales")
     datos = c.fetchall()
@@ -365,7 +367,7 @@ def obtener_bloqueos_especiales():
     return datos
 
 def obtener_clientes_fijos():
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
     cursor.execute("SELECT id, nombre, telefono, dias_semana, hora FROM clientes_fijos")
     datos = cursor.fetchall()
@@ -380,7 +382,7 @@ def obtener_disponibilidad():
     citas_ocupadas = cargar_citas()
     disponibilidad = {}
 
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     c.execute("SELECT fecha_inicio, fecha_fin FROM cierres")
@@ -584,7 +586,7 @@ def admin():
     if not session.get("admin"):
         return redirect("/login")
     
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     hoy_str = date.today().strftime("%Y-%m-%d")
@@ -712,7 +714,7 @@ def admin_anadir_cita():
     fecha = request.form["fecha"]
     hora = request.form["hora"]
 
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     c.execute("""
@@ -738,7 +740,7 @@ def anadir_cliente_fijo():
     if not dias_semana:
         return "Error: debes seleccionar un día"
 
-    conexion = sqlite3.connect("citas.db", timeout=10)
+    conexion = sqlite3.connect(DB_PATH, timeout=10)
     cursor = conexion.cursor()
     cursor.execute("""
         INSERT INTO clientes_fijos (nombre, telefono, dias_semana, hora)
@@ -754,7 +756,7 @@ def eliminar_cliente_fijo(id):
     if not session.get("admin"):
         return redirect("/login")
 
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
     cursor.execute("DELETE FROM clientes_fijos WHERE id = ?", (id,))
     conexion.commit()
@@ -767,7 +769,7 @@ def marcar_asistencia(dia, hora, estado):
     if not session.get("admin"):
         return redirect("/login")
     
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -803,7 +805,7 @@ def admin_cierre():
     motivo = request.form.get("motivo", "")
 
     if fecha_inicio and fecha_fin:
-        conexion = sqlite3.connect("citas.db")
+        conexion = sqlite3.connect(DB_PATH)
         cursor = conexion.cursor()
         cursor.execute("""
             INSERT INTO cierres (fecha_inicio, fecha_fin, motivo)
@@ -818,7 +820,7 @@ def eliminar_liberacion(id):
     if not session.get("admin"):
         return redirect("/login")
     
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("DELETE FROM liberaciones WHERE id =?", (id,))
     conn.commit()
@@ -831,7 +833,7 @@ def eliminar_cierre(id):
     if not session.get("admin"):
         return redirect("/login")
     
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("DELETE FROM cierres WHERE id =?", (id,))
     conn.commit()
@@ -846,7 +848,7 @@ def activar_extra_dia():
     
     fecha = request.form["fecha"]
 
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
     cursor.execute(
         "INSERT OR IGNORE INTO extras_dias (fecha) VALUES (?)",
@@ -864,7 +866,7 @@ def quitar_extra_dia():
     
     fecha = request.form["fecha"]
 
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
     cursor.execute(
         "DELETE FROM extras_dias WHERE fecha = ?",
@@ -880,7 +882,7 @@ def eliminar_bloqueo(id):
     if not session.get("admin"):
         return redirect("/login")
     
-    conn = sqlite3.connect("citas.db")
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("DELETE FROM bloqueos_especiales WHERE id =?", (id,))
     conn.commit()
@@ -897,7 +899,7 @@ def admin_liberar():
     hora = request.form.get("hora")
 
     if fecha and hora:
-        conexion = sqlite3.connect("citas.db")
+        conexion = sqlite3.connect(DB_PATH)
         cursor = conexion.cursor()
         cursor.execute("""
             INSERT INTO liberaciones (fecha, hora)
@@ -916,7 +918,7 @@ def admin_bloquear():
     hora = request.form.get("hora")
 
     if fecha and hora:
-        conexion = sqlite3.connect("citas.db")
+        conexion = sqlite3.connect(DB_PATH)
         cursor = conexion.cursor()
         cursor.execute("""
             INSERT INTO bloqueos_especiales (fecha, hora)
@@ -936,7 +938,7 @@ def confirmar(dia, hora):
     if not session.get("admin"):
         return redirect("/login")
     
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -958,7 +960,7 @@ def confirmar(dia, hora):
         nombre, telefono = fila
         fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
         dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
-        mensaje = f"Hola {nombre}, tu cita en Rocha Peluqueros ha sido confirmada para {dia_bonito} a las {hora}."
+        mensaje = f"Hola {nombre}, tu cita ha sido confirmada en Rocha Peluqueros para {dia_bonito} a las {hora}. Te esperamos"
         enviar_whatsapp(telefono, mensaje)
 
     return redirect("/admin")
@@ -968,7 +970,7 @@ def cancelar(dia, hora):
     if not session.get("admin"):
         return redirect("/login")
     
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute(
@@ -997,7 +999,7 @@ def cancelar(dia, hora):
 
 @app.route("/cancelar/<codigo>")
 def cancelar_cita(codigo):
-    conexion = sqlite3.connect("citas.db")
+    conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
     cursor.execute("""
@@ -1071,10 +1073,10 @@ def whatsapp_webhook():
         print("Error webhook WhatsApp:", e)
         return "OK", 200
     
-conexion = sqlite3.connect("citas.db")
+conexion = sqlite3.connect(DB_PATH)
 cursor = conexion.cursor()
 
-conexion = sqlite3.connect("citas.db")
+conexion = sqlite3.connect(DB_PATH)
 cursor = conexion.cursor()
 
 cursor.execute("""
