@@ -15,6 +15,7 @@ extras_activadas = False
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_FROM = "whatsapp:+14155238886"
+ADMIN_WHATSAPP_FROM = os.getenv("ADMIN_WHATSAPP")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai_client = OpenAI()
@@ -249,6 +250,17 @@ def guardar_cita(fecha, hora, nombre, telefono):
 
     conexion.commit()
     conexion.close()
+
+    mensaje_admin = f""" Nueva solicitud de cita
+
+    Cliente: {nombre}
+    Teléfono: {telefono}
+    Fecha: {fecha}
+    Hora: {hora}"""
+
+    if ADMIN_WHATSAPP:
+        enviar_whatsapp(ADMIN_WHATSAPP.replace("whatsapp:", ""), mensaje_admin)
+        
     return True
 
 def normalizar_telefono_whatsapp(telefono):
