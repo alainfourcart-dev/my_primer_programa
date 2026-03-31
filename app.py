@@ -6,8 +6,10 @@ from openai import OpenAI
 import os
 import sqlite3
 import uuid
+import shutil
 
 DB_PATH = "/var/data/citas.db"
+BACKUP_DIR = "/var/data/backups"
 URL_RESERVA = "https://rochapeluqueros.com"
 
 ADMIN_PASSWORD = "1234"
@@ -139,10 +141,33 @@ def inicializar_db():
     conexion.commit()
     conexion.close()
 
+def hacer_backup_db():
+    try:
+        os.makedirs(BACKUP_DIR, exist_ok=True)
+
+        if os.path.exists(DB_PATH):
+            fecha_backup = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            backup_path = os.path.join(BACKUP_DIR, f"citas_backup_{fecha_backup}.db")
+            shutil.copy2(DB_PATH, backup_path)
+            print("Backup creado:", backup_path)
+
+            backups = sorted(
+                [f for f in os.listdir(BACKUP_DIR) if f.endswith(".db")]
+            )
+            while len(backups) > 10:
+                archivo_antiguo = backups.pop(0)
+                ruta_antigua = os.path.join(BACKUP_DIR, archivo_antiguo)
+                os.remove(ruta_antigua)
+                print("Backup eliminado:", ruta_antigua)
+
+    except Exception as e:
+        print("Error creando backup:", e)
+
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
 inicializar_db()
+hacer_backup_db()
 
 def cargar_datos():
     datos = {}
