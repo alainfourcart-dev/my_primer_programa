@@ -629,7 +629,7 @@ def inicio():
             hora = request.form["hora"]
             nombre = request.form["nombre"]
             telefono = request.form["telefono"]
-            servicio = request.fomr["servicio"]
+            servicio = request.form["servicio"]
 
             guardada = guardar_cita(dia, hora, nombre, telefono, servicio)
 
