@@ -21,6 +21,11 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_FROM = "whatsapp:+14155238886"
 ADMIN_WHATSAPP = os.getenv("ADMIN_WHATSAPP")
+TWILIO_WHATSAPP_ENABLED = os.getenv("TWILIO_WHATSAPP_ENABLED", "false").lower() == "true"
+
+client = None
+if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai_client = OpenAI()
@@ -297,18 +302,19 @@ def guardar_cita(fecha, hora, nombre, telefono, servicio):
     Fecha: {fecha}
     Hora: {hora}"""
 
-    if ADMIN_WHATSAPP:
-        enviar_whatsapp(ADMIN_WHATSAPP.replace("whatsapp:", ""), mensaje_admin)
+    if TWILIO_WHATSAPP_ENABLED and ADMIN_WHATSAPP:
+        enviar_whatsapp(ADMIN_WHATSAPP, mensaje_admin)
 
     return True
 
 def normalizar_telefono_whatsapp(telefono):
-    telefono = telefono.strip().replace(" ", "")
+    telefono = telefono.strip()
+    telefono = telefono.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
     if telefono.startswith("+"):
         return f"whatsapp:{telefono}"
     if telefono.startswith("6") or telefono.startswith("7"):
         return f"whatsapp:+34{telefono}"
-    return f"whatsapp:{telefono}"
+    return None
 
 def enviar_recordatorios_citas():
     ahora = datetime.now()
@@ -337,22 +343,25 @@ def enviar_recordatorios_citas():
             fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
             dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
 
-            mensaje = f"""📌 Recordatoriode cita - Rocha Peluqueros 📌
+            mensaje = f"""📌 Recordatorio de cita - Rocha Peluqueros 📌
             Hola {nombre}, te recordamos tu cita para:
             📅 {dia_bonito}
             ⏰ {hora}
             Te esperamos, un saludo."""
 
             try:
-                enviar_whatsapp(telefono, mensaje)
+                enviado = enviar_whatsapp(telefono, mensaje)
 
-                cursor.execute("""
-                    UPDATE citas
-                    SET recordatorio_enviado = 1
-                    WHERE telefono = ? AND dia = ? AND hora = ?
-                """, (telefono, dia, hora))
+                if enviado:
+                    cursor.execute("""
+                        UPDATE citas
+                        SET recordatorio_enviado = 1
+                        WHERE telefono = ? AND dia = ? AND hora = ?
+                    """, (telefono, dia, hora))
 
-                enviados += 1
+                    enviados += 1
+                else:
+                    print(f"No se pudo enviar recordatorio a {telefono}")
             except Exception as e:
                 print("Error enviando recordatorio:", e)
 
@@ -362,9 +371,20 @@ def enviar_recordatorios_citas():
     return enviados
 
 def enviar_whatsapp(telefono, mensaje):
+    if not TWILIO_WHATSAPP_ENABLED:
+        print("Whatsapp desactivado")
+        return False
+    
+    if not client:
+        print("Twilio no configurado")
+        return False
+    
     try:
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         destino = normalizar_telefono_whatsapp(telefono)
+
+        if not destino:
+            print("Teléfono inválido para whatsapp:", telefono)
+            return False
 
         print("Enviando a:", destino)
         print("Mensaje:", mensaje)
@@ -388,7 +408,7 @@ Eres el asistente de WhatsApp de Rocha Peluqueros.
 
 Datos del negocio:
 - Horario: martes a viernes de 10:00 a 14:00 y de 16:30 a 21:00. Sábado de 10:00 a 14:00.
-- Servicios: corte, barba, corte + barba, corte + mechas, corte + color.
+- Servicios: corte, corte niño (hasta los 2 años), barba, corte + barba, corte + mechas, corte + color.
 - Las citas se solicitan desde un enlace con calendario.
 - Si el cliente quiere reservar, indícale este enlace: {URL_RESERVA}
 - Sé breve, amable y claro.
@@ -396,15 +416,30 @@ Datos del negocio:
 - Si no sabes algo, dilo sin inventar.
 """
     
-    respuesta = openai_client.responses.create(
-        model="gpt-4.1-mini",
-        input=[
-            {"role": "system", "content": prompt_sistema},
-            {"role": "user", "content": mensaje_usuario}
-        ]
-    )
+    try:
+        respuesta = openai_client.responses.create(
+            model="gpt-4.1-mini",
+            input=[
+                {"role": "system", "content": prompt_sistema},
+                {"role": "user", "content": mensaje_usuario}
+            ]
+        )
 
-    return respuesta.output_text.strip()
+        texto = respuesta.output_text.strip()
+
+        if not texto:
+            return f"Hola, puedes reservar tu cita aquí: {URL_RESERVA}"
+        
+        return texto
+    
+    except Exception as e:
+        print("Error en respuesta IA Whatsapp:", e)
+        return (
+            "Hola, ahora mismo no puedo responderte automáticamente. "
+            f"Si quieres reservar, aquí tienes el enlace: {URL_RESERVA}."
+            "Horario: martes a viernes de 10:00 a 14:00 y de 16:30 a 21:00, sábado de 10:00 a 14:00."
+        )
+
 
 def generar_horas(inicio, fin, intervalo=40, primera_diferente=False):
     horas = []
@@ -660,7 +695,7 @@ def login():
     error = ""
 
     if request.method == "POST":
-        password = request.form["password"]
+        password = request.form.get("password")
 
         if password == ADMIN_PASSWORD:
             session["admin"] = True
@@ -695,7 +730,6 @@ def admin():
         ORDER BY citas.dia, citas.hora
     """)
     citas = cursor.fetchall()
-    citas = sorted(citas, key=lambda x: (x[0], [1]))
 
     pendientes = [c for c in citas if c[5] == "pendiente"]
     confirmadas = [c for c in citas if c[5] == "confirmada"]
@@ -799,17 +833,32 @@ def admin_anadir_cita():
     if not session.get("admin"):
         return redirect("/login")
 
-    nombre = request.form["nombre"]
-    telefono = request.form["telefono"]
-    fecha = request.form["fecha"]
-    hora = request.form["hora"]
+    nombre = request.form.get("nombre").strip()
+    telefono = request.form.get("telefono").strip()
+    fecha = request.form.get("fecha")
+    hora = request.form.get("hora")
+
+    if not nombre or not telefono or not fecha or not hora:
+        return "Faltan datos obligatorios"
+    
+    if fecha < date.today().strftime("%Y-%m-%d"):
+        return "No puedes crear citas en una fecha pasada"
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     c.execute("""
-        INSERT INTO citas (dia, hora, nombre, telefono, estado)
-        VALUES (?, ?, ?, ?, 'confirmada')
+        SELECT 1 FROM citas
+        WHERE dia = ? AND hora = ? AND estado != 'cancelada'
+    """, (fecha, hora))
+
+    if c.fetchone():
+        conn.close()
+        return "Esa hora ya está ocupada."
+
+    c.execute("""
+        INSERT INTO citas (dia, hora, nombre, telefono, estado, recordatorio_enviado)
+        VALUES (?, ?, ?, ?, 'confirmada', 0)
     """, (fecha, hora, nombre, telefono))
 
     conn.commit()
@@ -817,7 +866,7 @@ def admin_anadir_cita():
 
     return redirect("/admin")
 
-@app.route("/enviar_recordatorios")
+@app.route("/enviar_recordatorios", methods=["GET"])
 def lanzar_recordatorios():
     if not session.get("admin"):
         return redirect ("/login")
@@ -830,16 +879,20 @@ def anadir_cliente_fijo():
     if not session.get("admin"):
         return redirect("/login")
 
-    nombre = request.form["nombre"]
-    telefono = request.form["telefono"]
-    dias_semana = request.form["dia_semana"]
-    hora = request.form["hora"]
+    nombre = request.form.get("nombre")
+    telefono = request.form.get("telefono")
+    dias_semana = request.form.get("dia_semana")
+    hora = request.form.get("hora")
 
-    if not dias_semana:
-        return "Error: debes seleccionar un día"
+    if not nombre or not telefono or not dias_semana or not hora:
+        return "Faltan datos obligatorios"
+    
+    nombre = nombre.strip()
+    telefono = telefono.strip()
 
     conexion = sqlite3.connect(DB_PATH, timeout=10)
     cursor = conexion.cursor()
+
     cursor.execute("""
         INSERT INTO clientes_fijos (nombre, telefono, dias_semana, hora)
         VALUES (?, ?, ?, ?)
@@ -849,7 +902,7 @@ def anadir_cliente_fijo():
 
     return redirect("/admin")
 
-@app.route("/admin/eliminar_cliente_fijo/<int:id>")
+@app.route("/admin/eliminar_cliente_fijo/<int:id>", methods=["POST"])
 def eliminar_cliente_fijo(id):
     if not session.get("admin"):
         return redirect("/login")
@@ -1077,13 +1130,6 @@ def cancelar(dia, hora):
     )
     fila = cursor.fetchone()
 
-    if fila:
-        nombre, telefono = fila
-        fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
-        dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
-        mensaje = f"Hola {nombre}, tu solicitud de cita en Rocha Peluqueros para {dia_bonito} a las {hora} ha sido cancelada."
-        enviar_whatsapp(telefono, mensaje)
-
     cursor.execute("""
         UPDATE citas 
         SET estado = 'cancelada'
@@ -1092,6 +1138,13 @@ def cancelar(dia, hora):
 
     conexion.commit()
     conexion.close()
+
+    if fila:
+        nombre, telefono = fila
+        fecha_obj = datetime.strptime(dia, "%Y-%m-%d")
+        dia_bonito = f"{DIAS_ES[fecha_obj.weekday()]} {fecha_obj.strftime('%d/%m')}"
+        mensaje = f"Hola {nombre}, tu solicitud de cita en Rocha Peluqueros para {dia_bonito} a las {hora} ha sido cancelada."
+        enviar_whatsapp(telefono, mensaje)
 
     return redirect("/admin")
 
@@ -1154,6 +1207,9 @@ def whatsapp_webhook():
             print("Error IA:", e)
             texto_respuesta = f"Ahora mismo no puedo responder, pero puedes reservar aquí: {URL_RESERVA}"
 
+        if not texto_respuesta:
+            texto_respuesta = f"Puedes reservar aquí: {URL_RESERVA}"
+
         print("Respuesta IA:", texto_respuesta)
 
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
@@ -1171,19 +1227,6 @@ def whatsapp_webhook():
         print("Error webhook WhatsApp:", e)
         return "OK", 200
     
-conexion = sqlite3.connect(DB_PATH)
-cursor = conexion.cursor()
-
-conexion = sqlite3.connect(DB_PATH)
-cursor = conexion.cursor()
-
-cursor.execute("""
-INSERT INTO bloqueos_especiales (fecha, hora)
-VALUES (?, ?)
-""", ("2026-04-07", "17:00"))
-
-conexion.commit()
-conexion.close()
 
 if __name__ == "__main__":
     import os
