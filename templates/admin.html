@@ -488,6 +488,7 @@ function mostrarSeccion(idPanel, boton) {
                                         <div>
                                             <span class="hora">{{ cita["hora"] }}</span>
                                             <strong>{{ cita["nombre"] }} </strong> · {{ cita["telefono"] }}
+                                            <br><span><strong>Servicio:</strong> {{ cita["servicio"] or "No indicado" }}</span>
 
                                             {% if cita.get("faltas", 0) > 0 %}
                                                 <span class="etiqueta-aviso">⚠️ {{ cita["faltas"] }} falta{{ "s" if cita["faltas"] > 1 else "" }}</span>
