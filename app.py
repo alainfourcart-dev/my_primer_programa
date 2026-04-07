@@ -688,7 +688,7 @@ def admin():
     conexion.commit()
 
     cursor.execute("""
-        SELECT citas.dia, citas.hora, citas.nombre, citas.telefono, citas.estado,
+        SELECT citas.dia, citas.hora, citas.nombre, citas.telefono, citas.servicio, citas.estado,
                 COALESCE(clientes.faltas, 0) as faltas
         FROM citas
         LEFT JOIN clientes ON citas.telefono = clientes.telefono
@@ -697,16 +697,16 @@ def admin():
     citas = cursor.fetchall()
     citas = sorted(citas, key=lambda x: (x[0], [1]))
 
-    pendientes = [c for c in citas if c[4] == "pendiente"]
-    confirmadas = [c for c in citas if c[4] == "confirmada"]
-    canceladas = [c for c in citas if c[4] == "cancelada"]
+    pendientes = [c for c in citas if c[5] == "pendiente"]
+    confirmadas = [c for c in citas if c[5] == "confirmada"]
+    canceladas = [c for c in citas if c[5] == "cancelada"]
     total_canceladas = len(canceladas)
 
     def agrupar_por_dia(lista_citas):
         dias = defaultdict(list)
 
         for cita in lista_citas:
-            dia_str, hora, nombre, telefono, estado, faltas = cita
+            dia_str, hora, nombre, telefono, servicio, estado, faltas = cita
 
             fecha_obj = datetime.strptime(dia_str, "%Y-%m-%d")
             nombres_dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -725,6 +725,7 @@ def admin():
                 "hora": hora,
                 "nombre": nombre,
                 "telefono": telefono,
+                "servicio": servicio,
                 "estado": estado,
                 "faltas": faltas
             })
