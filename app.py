@@ -143,6 +143,11 @@ def inicializar_db():
     except:
         pass
 
+    try:
+        cursor.execute("ALTER TABLE citas ADD COLUMN servicio TEXT")
+    except:
+        pass
+
     conexion.commit()
     conexion.close()
 
@@ -254,7 +259,7 @@ def hora_bloqueada_especial(fecha_str, hora):
 
     return resultado is not None
 
-def guardar_cita(fecha, hora, nombre, telefono):
+def guardar_cita(fecha, hora, nombre, telefono, servicio):
     conexion = sqlite3.connect(DB_PATH)
     cursor = conexion.cursor()
 
@@ -272,9 +277,9 @@ def guardar_cita(fecha, hora, nombre, telefono):
     print("CODIGO CANCELACION:", codigo_cancelacion)
 
     cursor.execute("""
-        INSERT INTO citas (dia, hora, nombre, telefono, codigo_cancelacion, estado)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """, (fecha, hora, nombre, telefono, codigo_cancelacion, "pendiente"))
+        INSERT INTO citas (dia, hora, nombre, telefono, codigo_cancelacion, estado, servicio)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (fecha, hora, nombre, telefono, codigo_cancelacion, "pendiente", servicio))
 
     cursor.execute("""
         INSERT OR IGNORE INTO clientes (nombre, telefono)
@@ -288,6 +293,7 @@ def guardar_cita(fecha, hora, nombre, telefono):
 
     Cliente: {nombre}
     Teléfono: {telefono}
+    Servicio: {servicio}
     Fecha: {fecha}
     Hora: {hora}"""
 
@@ -623,8 +629,9 @@ def inicio():
             hora = request.form["hora"]
             nombre = request.form["nombre"]
             telefono = request.form["telefono"]
+            servicio = request.fomr["servicio"]
 
-            guardada = guardar_cita(dia, hora, nombre, telefono)
+            guardada = guardar_cita(dia, hora, nombre, telefono, servicio)
 
             tipo_respuesta = ""
 
