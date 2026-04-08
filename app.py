@@ -402,6 +402,23 @@ def enviar_whatsapp(telefono, mensaje):
         print("Error enviando whatsApp:", e)
         return False
 
+def detectar_intencion_whatsapp(mensaje):
+    texto = mensaje.strip().lowser()
+
+    if any(p in texto for p in ["cancelar", "anular", "quita mi cita", "quiero cancelar"]):
+        return "cancelar"
+
+    if any(p in texto for p in ["horario", "horarios", "abrís", "abreis", "cuando abrís", "cuando abreis"]):
+        return "horarios"
+
+    if any(p in texto for p in ["precio", "precios", "cuánto cuesta", "cuanto cuesta", "cuanto vale", "tarifa", "tarifas"]):
+        return "precios"
+
+    if any(p in texto for p in ["cita", "reservar", "quiero una cita", "reserva", "quiero reservar"]):
+        return "reservar"
+    
+    return "general"
+
 def respuesta_ia_whatsapp(mensaje_usuario):
     prompt_sistema = f"""
 Eres el asistente de WhatsApp de Rocha Peluqueros.
@@ -1193,6 +1210,8 @@ def whatsapp_webhook():
 
         mensaje = request.form.get("Body", "").strip()
         telefono = request.form.get("From", "").strip()
+        intencion = detectar_intencion_whatsapp(mensaje)
+        print("Intencion detectada:", intencion)
 
         print("Mensaje recibido:", mensaje)
         print("Telefono recibido:", telefono)
@@ -1202,15 +1221,36 @@ def whatsapp_webhook():
             return "OK", 200
     
         try:
-            texto_respuesta = respuesta_ia_whatsapp(mensaje)
+            if intencion == "reservar":
+                texto_respuesta = f"Perfecto. Puedes reservar tu cita aquí: {URL_RESERVA}"
+
+            elif intencion == "horarios":
+                texto_respuesta = (
+                    "Nuestro horarios es:\n"
+                    "Martes a viernes de 10:00 a 14:00 y de 16:30 a 21:00.\n"
+                    "Sábados de 10:00 a 14:00."
+                )
+            elif intencion == "precios":
+                texto_respuesta = (
+                    "Para precios exactos, dinos qué servicio quieres o reserva aquí:\n"
+                    f"{URL_RESERVA}"
+                )
+            elif intencion == "cancelar":
+                texto_respuesta = (
+                    "Si quieres cancelar tu cita, usa el enlace de cancelación que recibiste.\n"
+                    "Si no lo tienes, escríbenos y te ayudamos."
+                )
+            else:
+                texto_respuesta = respuesta_ia_whatsapp(mensaje)
+
         except Exception as e:
             print("Error IA:", e)
             texto_respuesta = f"Ahora mismo no puedo responder, pero puedes reservar aquí: {URL_RESERVA}"
 
         if not texto_respuesta:
             texto_respuesta = f"Puedes reservar aquí: {URL_RESERVA}"
-
         print("Respuesta IA:", texto_respuesta)
+        
 
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         respuesta = client.messages.create(
@@ -1227,6 +1267,7 @@ def whatsapp_webhook():
         print("Error webhook WhatsApp:", e)
         return "OK", 200
     
+
 
 if __name__ == "__main__":
     import os
